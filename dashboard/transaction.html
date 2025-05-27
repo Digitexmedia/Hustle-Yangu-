@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transactions - Hustle Yangu</title>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #f97316;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+
+    th {
+      background-color: #1e293b;
+      color: #fbbf24;
+    }
+
+    tr:nth-child(even) {
+      background-color: #1e293b;
+    }
+
+    .no-data {
+      text-align: center;
+      margin-top: 30px;
+      color: #f87171;
+    }
+
+    @media screen and (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      tr {
+        margin-bottom: 15px;
+      }
+
+      td {
+        padding-left: 50%;
+        position: relative;
+      }
+
+      td::before {
+        position: absolute;
+        top: 12px;
+        left: 15px;
+        width: 45%;
+        white-space: nowrap;
+        font-weight: bold;
+        color: #94a3b8;
+      }
+
+      td:nth-of-type(1)::before { content: "Type"; }
+      td:nth-of-type(2)::before { content: "Amount"; }
+      td:nth-of-type(3)::before { content: "Date"; }
+
+      thead {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧾 Wallet Transactions</h2>
+
+  <table id="transactionsTable">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Amount (KES)</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody id="transactionsBody">
+    </tbody>
+  </table>
+
+  <div class="no-data" id="noData">No transactions found.</div>
+
+  <script>
+    function formatDate(date) {
+      return new Date(date).toLocaleString("en-KE", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function loadTransactions() {
+      const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+      const tbody = document.getElementById("transactionsBody");
+      const noData = document.getElementById("noData");
+
+      if (transactions.length === 0) {
+        noData.style.display = "block";
+        return;
+      }
+
+      noData.style.display = "none";
+      tbody.innerHTML = "";
+
+      transactions.reverse().forEach(tx => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td style="color: ${tx.type === 'Deposit' ? '#10b981' : '#ef4444'};"><strong>${tx.type}</strong></td>
+          <td>KES ${parseFloat(tx.amount).toFixed(2)}</td>
+          <td>${formatDate(tx.date)}</td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    loadTransactions();
+  </script>
+
+</body>
+</html>
