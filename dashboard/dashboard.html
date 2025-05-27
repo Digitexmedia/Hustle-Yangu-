@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hustle Yangu Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f172a;
+      color: white;
+    }
+
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #1e293b;
+      overflow-x: hidden;
+      padding-top: 20px;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 2000;
+    }
+
+    .sidebar.show {
+      transform: translateX(0);
+    }
+
+    .sidebar a {
+      padding: 12px 20px;
+      text-decoration: none;
+      font-size: 16px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #334155;
+    }
+
+    .closebtn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .hamburger {
+      font-size: 26px;
+      cursor: pointer;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      color: white;
+      z-index: 2100;
+    }
+
+    .backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+      z-index: 1500;
+      display: none;
+    }
+
+    .backdrop.show {
+      display: block;
+    }
+
+    .main-content {
+      margin-left: 0;
+      padding: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .main-content {
+        margin-left: 250px;
+      }
+    }
+  </style>
+</head>
+
+<body onload="loadSection('home')">
+
+<div class="hamburger" onclick="openSidebar()"><i class="fas fa-bars"></i></div>
+<div class="backdrop" id="backdrop" onclick="closeSidebar()"></div>
+
+<div id="sidebar" class="sidebar">
+  <div class="closebtn" onclick="closeSidebar()">&times;</div>
+  <a href="javascript:void(0);" onclick="loadSection('home')"><i class="fas fa-home"></i> Home</a>
+  <a href="javascript:void(0);" onclick="loadSection('vip')"><i class="fas fa-gem"></i> VIP</a>
+  <a href="javascript:void(0);" onclick="loadSection('invites')"><i class="fas fa-qrcode"></i> Invites</a>
+  <a href="javascript:void(0);" onclick="loadSection('deposit')"><i class="fas fa-coins"></i> Deposit</a>
+  <a href="javascript:void(0);" onclick="loadSection('withdraw')"><i class="fas fa-money-bill-wave"></i> Withdraw</a>
+  <a href="javascript:void(0);" onclick="loadSection('transactions')"><i class="fas fa-file-invoice-dollar"></i> Transactions</a>
+  <a href="javascript:void(0);" onclick="loadSection('profile')"><i class="fas fa-user-cog"></i> Profile</a>
+  <a href="javascript:void(0);" onclick="loadSection('app')"><i class="fas fa-mobile-alt"></i> App</a>
+  <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<div class="main-content" id="main-content">
+  <!-- Content from individual pages will load here -->
+</div>
+
+<script>
+  function openSidebar() {
+    document.getElementById("sidebar").classList.add("show");
+    document.getElementById("backdrop").classList.add("show");
+  }
+
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("show");
+    document.getElementById("backdrop").classList.remove("show");
+  }
+
+  function loadSection(section) {
+    fetch(`dashboard/${section}.html`)
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("main-content").innerHTML = html;
+        closeSidebar();
+      })
+      .catch(err => {
+        document.getElementById("main-content").innerHTML = "<p>Failed to load section.</p>";
+      });
+  }
+</script>
+
+</body>
+</html>
