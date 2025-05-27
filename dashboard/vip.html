@@ -1,0 +1,159 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VIP Plans - Hustle Yangu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f172a;
+      color: white;
+    }
+    h2 {
+      text-align: center;
+      padding: 20px;
+      color: #facc15;
+    }
+    .plans {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .plan {
+      background-color: #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 2px solid #f97316;
+    }
+    .plan h3 {
+      margin: 10px 0;
+      color: #38bdf8;
+    }
+    .plan p {
+      margin: 5px 0;
+    }
+    .join-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .join-btn:hover {
+      background-color: #059669;
+    }
+    .notification {
+      text-align: center;
+      margin-top: 20px;
+      color: #facc15;
+    }
+    #investmentChart {
+      max-width: 600px;
+      margin: 30px auto;
+    }
+  </style>
+</head>
+<body><h2>Choose Your VIP Plan</h2>
+<div class="plans" id="plansContainer"></div>
+<div class="notification" id="notification"></div>
+<canvas id="investmentChart"></canvas><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script>
+  const plans = [
+    { name: "Basic", capital: 600 },
+    { name: "Bronze", capital: 1200 },
+    { name: "Silver", capital: 2400 },
+    { name: "Gold", capital: 4800 },
+    { name: "Platinum", capital: 12000 },
+    { name: "Diamond", capital: 17000 },
+    { name: "Executive", capital: 22000 },
+    { name: "Elite", capital: 28000 },
+    { name: "Supreme", capital: 35000 },
+    { name: "Royal", capital: 50000 },
+  ];
+
+  let wallet = parseFloat(localStorage.getItem('walletBalance') || '0');
+  let activeInvestments = JSON.parse(localStorage.getItem('investments') || '[]');
+
+  function updateUI() {
+    const container = document.getElementById("plansContainer");
+    container.innerHTML = "";
+    plans.forEach((plan, index) => {
+      const dailyIncome = plan.capital * 0.2;
+      const div = document.createElement("div");
+      div.className = "plan";
+      div.innerHTML = `
+        <h3>VIP-${index + 1} (${plan.name})</h3>
+        <p>Capital: KES ${plan.capital.toLocaleString()}</p>
+        <p>Daily Income: KES ${dailyIncome.toLocaleString()}</p>
+        <p>Duration: 10 Days</p>
+        <button class="join-btn" onclick="joinPlan(${index})">Join</button>
+      `;
+      container.appendChild(div);
+    });
+    drawChart();
+  }
+
+  function joinPlan(index) {
+    const plan = plans[index];
+    const dailyIncome = plan.capital * 0.2;
+    if (wallet < plan.capital) {
+      document.getElementById("notification").innerText = "! Insufficient account balance, please top up!";
+      return;
+    }
+    wallet -= plan.capital;
+    localStorage.setItem("walletBalance", wallet);
+    activeInvestments.push({ name: plan.name, capital: plan.capital, income: dailyIncome, days: 10 });
+    localStorage.setItem("investments", JSON.stringify(activeInvestments));
+    document.getElementById("notification").innerText = "Congratulations 👏 You have joined " + plan.name + "!";
+    updateUI();
+  }
+
+  function drawChart() {
+    const ctx = document.getElementById("investmentChart").getContext("2d");
+    const labels = activeInvestments.map((inv, i) => inv.name + " (#" + (i + 1) + ")");
+    const data = activeInvestments.map(inv => inv.capital);
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "Capital Invested",
+          data,
+          backgroundColor: "#38bdf8",
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: '#fff'
+            }
+          },
+          x: {
+            ticks: {
+              color: '#fff'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#fff'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  updateUI();
+</script></body>
+</html>
