@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Hustle Yangu" />
+  <title>Register | Hustle Yangu - Join and Start Earning</title>
+
+  <link rel="shortcut icon" href="./public/over1.jpg" type="image/x-icon" />
+  <link rel="stylesheet" href="./public/assets/css/theme.min.css" />
+  <link href="./public/assets/libs/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="./public/assets/libs/simplebar/dist/simplebar.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1f3d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .form-card {
+      background: #1a1f3d;
+      padding: 50px 40px;
+      border-radius: 20px;
+      width: 400px;
+      box-shadow: 0 8px 20px rgba(101, 71, 255, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.05);
+      color: #e0e6ff;
+    }
+
+    .form-title {
+      font-weight: 900;
+      font-size: 2.3rem;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #ff8c00;
+      text-shadow: 0 0 10px #ff8c00aa;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #c7d0ffcc;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 14px;
+      border: 2.5px solid #3a4070;
+      background-color: #262c57;
+      color: #e0e6ff;
+      box-shadow: inset 0 3px 7px #3a4070aa, 0 0 5px transparent;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #ff8c00;
+      box-shadow: inset 0 3px 7px #ff8c00aa, 0 0 12px #ff8c00cc;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px 0;
+      border-radius: 18px;
+      border: none;
+      font-weight: 900;
+      font-size: 18px;
+      color: #1a1f3d;
+      background: linear-gradient(90deg, #ff8c00, #ffc870);
+      box-shadow: 0 6px 15px #ff8c00cc;
+      cursor: pointer;
+      transition: background 0.35s ease;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(90deg, #ffc870, #ff8c00);
+    }
+
+    .links {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .links a {
+      color: #b5bbffcc;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .links a:hover {
+      color: #ff8c00;
+    }
+
+    @media (max-width: 440px) {
+      .form-card {
+        width: 90vw;
+        padding: 35px 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="form-card" role="main" aria-label="Registration Form">
+    <h1 class="form-title">Join Hustle Yangu</h1>
+
+    <form method="POST" action="https://hustleyangu.site/register">
+      <input type="hidden" name="_token" value="YOUR_CSRF_TOKEN_HERE">
+
+      <div class="input-group">
+        <label for="name">Full Name</label>
+        <input id="name" type="text" name="name" required placeholder="Enter your full name" />
+      </div>
+
+      <div class="input-group">
+        <label for="phone">Phone Number</label>
+        <input id="phone" type="tel" name="phone" required placeholder="07XXXXXXXX" />
+      </div>
+
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input id="username" type="text" name="username" required placeholder="Create a username" />
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" required placeholder="Create a password" />
+      </div>
+
+      <div class="input-group">
+        <label for="password_confirmation">Confirm Password</label>
+        <input id="password_confirmation" type="password" name="password_confirmation" required placeholder="Confirm password" />
+      </div>
+
+      <button type="submit" class="btn-primary">Register</button>
+
+      <div class="links">
+        Already have an account?
+        <a href="login.html">Login here</a>
+      </div>
+    </form>
+  </div>
+</body>
+
+</html>
