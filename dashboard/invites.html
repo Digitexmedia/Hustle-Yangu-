@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hustle Yangu - Invites</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <style>
+    body {
+      background-color: #0f172a;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      color: #f97316;
+      margin-bottom: 20px;
+    }
+    .referral-section {
+      background-color: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      max-width: 600px;
+    }
+    .referral-link {
+      background-color: #334155;
+      padding: 12px;
+      border-radius: 8px;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+    }
+    .copy-btn {
+      background-color: #f97316;
+      border: none;
+      padding: 8px 12px;
+      color: black;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .copy-btn:hover {
+      background-color: #ea580c;
+    }
+    .stats {
+      display: flex;
+      gap: 25px;
+      margin-top: 10px;
+    }
+    .stat-card {
+      background-color: #1e40af;
+      flex: 1;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+    }
+    .stat-card h3 {
+      margin: 5px 0;
+      color: #22d3ee;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+    th {
+      background-color: #334155;
+    }
+    tr:hover {
+      background-color: #334155;
+    }
+    .no-invites {
+      text-align: center;
+      margin-top: 20px;
+      font-style: italic;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Invites & Referral Program</h2>
+
+  <div class="referral-section">
+    <p>Share your referral link and earn commission on each signup!</p>
+    <div class="referral-link" id="referralLink">
+      https://hustleyangu.site/register?ref=6723
+      <button class="copy-btn" onclick="copyReferralLink()">Copy</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <h4>People Invited</h4>
+        <h3 id="invitedCount">0</h3>
+      </div>
+      <div class="stat-card">
+        <h4>Referral Earnings</h4>
+        <h3 id="referralEarnings">KES 0.00</h3>
+      </div>
+    </div>
+  </div>
+
+  <h3>Your Invited Users</h3>
+
+  <table id="invitedUsersTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Date Joined</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="4" class="no-invites">No invites yet.</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    // Example data (replace with actual data source)
+    const referralLink = 'https://hustleyangu.site/register?ref=6723';
+    const invitedUsers = [
+      { username: 'john_doe', joined: '2025-05-21', status: 'Active' },
+      { username: 'jane_smith', joined: '2025-05-23', status: 'Pending' }
+    ];
+    const referralEarnings = 350; // KES
+
+    // Update referral link (if dynamic)
+    document.getElementById('referralLink').childNodes[0].textContent = referralLink;
+
+    // Copy referral link to clipboard
+    function copyReferralLink() {
+      navigator.clipboard.writeText(referralLink).then(() => {
+        alert('Referral link copied to clipboard!');
+      });
+    }
+
+    // Update stats
+    document.getElementById('invitedCount').textContent = invitedUsers.length;
+    document.getElementById('referralEarnings').textContent = `KES ${referralEarnings.toFixed(2)}`;
+
+    // Populate invited users table
+    const tbody = document.querySelector('#invitedUsersTable tbody');
+    tbody.innerHTML = ''; // Clear default no-invites row
+    if(invitedUsers.length === 0){
+      tbody.innerHTML = '<tr><td colspan="4" class="no-invites">No invites yet.</td></tr>';
+    } else {
+      invitedUsers.forEach((user, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${user.username}</td>
+          <td>${user.joined}</td>
+          <td>${user.status}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
