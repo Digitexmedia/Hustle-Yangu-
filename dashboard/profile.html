@@ -3,150 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Profile - Hustle Yangu</title>
+  <title>Hustle Yangu - Profile</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
   <style>
     body {
-      background-color: #0f172a;
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 20px;
+      background-color: #0c1123;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
     }
-
-    h2 {
-      color: #22d3ee;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .card {
-      background-color: #1e293b;
-      padding: 25px;
-      border-radius: 12px;
-      max-width: 500px;
-      margin: auto;
-    }
-
-    label {
-      display: block;
-      color: #fbbf24;
-      font-weight: bold;
-      margin-top: 15px;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: none;
-      background-color: #334155;
-      color: white;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
-      background-color: #22c55e;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #16a34a;
-    }
-
-    .section-title {
-      margin-top: 30px;
-      color: #f97316;
-      text-align: center;
-    }
-
-    .success, .error {
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    .success {
-      color: #10b981;
-    }
-
-    .error {
-      color: #f87171;
+    input, button {
+      border-radius: 0.5rem;
     }
   </style>
 </head>
-<body>
+<body class="p-4">
+  <div class="max-w-xl mx-auto bg-gray-900 p-6 rounded-2xl shadow-lg">
+    <h2 class="text-2xl font-bold text-teal-400 mb-4">👤 Profile Information</h2>
 
-  <h2>User Profile</h2>
+    <label class="block mb-2 text-sm font-semibold">Username</label>
+    <input id="username" type="text" class="w-full p-2 bg-gray-800 text-white mb-4"/>
 
-  <div class="card">
-    <!-- Editable Info -->
-    <label for="username">Username:</label>
-    <input type="text" id="username" placeholder="Enter your name">
+    <label class="block mb-2 text-sm font-semibold">Email</label>
+    <input id="email" type="email" class="w-full p-2 bg-gray-800 text-white mb-4"/>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" placeholder="Enter your email">
+    <label class="block mb-2 text-sm font-semibold">Phone Number</label>
+    <input id="phone" type="text" class="w-full p-2 bg-gray-800 text-white mb-6"/>
 
-    <label for="phone">Phone Number:</label>
-    <input type="text" id="phone" placeholder="07XXXXXXXX">
+    <h3 class="text-xl font-bold text-orange-400 mb-2">🔐 Reset Password</h3>
+    <input id="newPassword" type="password" placeholder="New Password" class="w-full p-2 mb-2 bg-gray-800 text-white"/>
+    <input id="confirmPassword" type="password" placeholder="Confirm Password" class="w-full p-2 mb-4 bg-gray-800 text-white"/>
 
-    <button onclick="updateProfile()">Update Profile</button>
-    <div id="profileMsg" class="success"></div>
-
-    <!-- Password Reset -->
-    <h3 class="section-title">Reset Password</h3>
-    <input type="password" id="newPassword" placeholder="Enter new password">
-    <button onclick="resetPassword()">Update Password</button>
-    <div id="passMsg" class="success"></div>
+    <div class="flex justify-between">
+      <button id="saveBtn" class="bg-teal-500 hover:bg-teal-600 px-4 py-2 text-white">Save</button>
+      <button onclick="window.location.href='dashboard.html'" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 text-white">Back to Dashboard</button>
+    </div>
   </div>
 
   <script>
-    // Load saved data
-    window.onload = () => {
-      document.getElementById("username").value = localStorage.getItem("username") || "";
-      document.getElementById("email").value = localStorage.getItem("email") || "";
-      document.getElementById("phone").value = localStorage.getItem("phone") || "";
-    };
+    // Load current user data
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
 
-    function updateProfile() {
-      const name = document.getElementById("username").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const msg = document.getElementById("profileMsg");
+    document.getElementById('username').value = currentUser.username || '';
+    document.getElementById('email').value = currentUser.email || '';
+    document.getElementById('phone').value = currentUser.phone || '';
 
-      if (!name || !email || !phone.match(/^07\d{8}$/)) {
-        msg.innerText = "Please enter valid details.";
-        msg.className = "error";
+    // Save updated user info
+    document.getElementById('saveBtn').addEventListener('click', function () {
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (!username || !email || !phone) {
+        alert("All fields are required.");
         return;
       }
 
-      localStorage.setItem("username", name);
-      localStorage.setItem("email", email);
-      localStorage.setItem("phone", phone);
-      msg.innerText = "Profile updated successfully!";
-      msg.className = "success";
-    }
-
-    function resetPassword() {
-      const newPassword = document.getElementById("newPassword").value;
-      const msg = document.getElementById("passMsg");
-
-      if (newPassword.length < 4) {
-        msg.innerText = "Password too short!";
-        msg.className = "error";
+      if ((newPassword || confirmPassword) && newPassword !== confirmPassword) {
+        alert("Passwords do not match.");
         return;
       }
 
-      localStorage.setItem("password", newPassword);
-      msg.innerText = "Password updated successfully!";
-      msg.className = "success";
-      document.getElementById("newPassword").value = "";
-    }
+      const updatedUser = { username, email, phone };
+
+      // Add password only if changed
+      if (newPassword && newPassword === confirmPassword) {
+        updatedUser.password = newPassword;
+      } else {
+        updatedUser.password = currentUser.password; // Keep existing password
+      }
+
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      alert("Profile updated successfully!");
+
+      // Redirect to dashboard
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 500);
+    });
   </script>
-
 </body>
 </html>
