@@ -4,171 +4,145 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Register | Hustle Yangu</title>
+  <link rel="stylesheet" href="./public/assets/css/theme.min.css">
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #1a1f3d;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #e0e6ff;
     }
     .form-card {
       background: #1a1f3d;
-      padding: 50px 40px;
+      padding: 40px;
       border-radius: 20px;
       width: 400px;
-      box-shadow: 0 8px 20px rgba(101, 71, 255, 0.4),
-                  inset 0 0 10px rgba(255, 255, 255, 0.05);
-      color: #e0e6ff;
+      box-shadow: 0 8px 20px rgba(101, 71, 255, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.05);
     }
-    .form-title {
-      font-weight: 900;
-      font-size: 2.2rem;
-      margin-bottom: 35px;
+    h2 {
       text-align: center;
+      margin-bottom: 20px;
       color: #ff8c00;
-      text-shadow: 0 0 10px #ff8c00aa;
     }
     .input-group {
       margin-bottom: 20px;
     }
     label {
       display: block;
-      font-weight: 700;
       margin-bottom: 6px;
-      font-size: 14px;
-      color: #c7d0ffcc;
     }
-    input {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
       width: 100%;
-      padding: 14px 18px;
-      font-size: 16px;
-      font-weight: 500;
-      border-radius: 14px;
-      border: 2.5px solid #3a4070;
-      background-color: #262c57;
-      color: #e0e6ff;
-      box-shadow: inset 0 3px 7px #3a4070aa;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      outline: none;
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid #3a4070;
+      background: #262c57;
+      color: #fff;
     }
-    input:focus {
-      border-color: #ff8c00;
-      box-shadow: inset 0 3px 7px #ff8c00aa, 0 0 12px #ff8c00cc;
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .checkbox-group input {
+      margin-right: 10px;
     }
     .btn-primary {
       width: 100%;
-      padding: 16px 0;
-      border-radius: 18px;
+      padding: 14px;
+      border-radius: 14px;
       border: none;
-      font-weight: 900;
-      font-size: 18px;
-      color: #1a1f3d;
       background: linear-gradient(90deg, #ff8c00, #ffc870);
-      box-shadow: 0 6px 15px #ff8c00cc;
+      color: #1a1f3d;
+      font-weight: bold;
+      font-size: 16px;
       cursor: pointer;
-      transition: background 0.35s ease;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(90deg, #ffc870, #ff8c00);
     }
     .links {
-      margin-top: 28px;
       text-align: center;
-      font-size: 14px;
-      color: #b5bbffcc;
+      margin-top: 20px;
     }
     .links a {
       color: #b5bbffcc;
-      font-weight: 600;
       text-decoration: none;
-      transition: color 0.3s ease;
     }
     .links a:hover {
       color: #ff8c00;
     }
-    @media (max-width: 440px) {
-      .form-card {
-        width: 90vw;
-        padding: 35px 25px;
-      }
-    }
   </style>
 </head>
 <body>
-  <div class="form-card">
-    <h1 class="form-title">Create Account</h1>
-    <form id="registerForm">
-      <div class="input-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" required placeholder="Enter username" />
-      </div>
 
-      <div class="input-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" required placeholder="Enter your email" />
-      </div>
+<div class="form-card">
+  <h2>Create Account</h2>
+  <form method="POST" action="https://hustleyangu.site/register" onsubmit="saveRegisterCookie()">
+    <div class="input-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required />
+    </div>
+    <div class="input-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+    </div>
+    <div class="input-group">
+      <label for="phone">Phone</label>
+      <input type="text" id="phone" name="phone" required />
+    </div>
+    <div class="input-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+    </div>
+    <div class="checkbox-group">
+      <input type="checkbox" id="remember" />
+      <label for="remember">Remember me</label>
+    </div>
+    <button type="submit" class="btn-primary">Register</button>
+    <div class="links">
+      <a href="login.html">Already have an account? Login</a>
+    </div>
+  </form>
+</div>
 
-      <div class="input-group">
-        <label for="phone">Phone Number</label>
-        <input type="tel" id="phone" required placeholder="e.g. 07xxxxxxxx" />
-      </div>
+<script>
+  // Prefill if cookie exists
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = getCookie('hustle_user');
+    const savedEmail = getCookie('hustle_email');
+    const savedPhone = getCookie('hustle_phone');
+    if (savedUser) document.getElementById('username').value = savedUser;
+    if (savedEmail) document.getElementById('email').value = savedEmail;
+    if (savedPhone) document.getElementById('phone').value = savedPhone;
+  });
 
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" required placeholder="Create a password" />
-      </div>
+  function saveRegisterCookie() {
+    if (document.getElementById('remember').checked) {
+      setCookie('hustle_user', document.getElementById('username').value, 30);
+      setCookie('hustle_email', document.getElementById('email').value, 30);
+      setCookie('hustle_phone', document.getElementById('phone').value, 30);
+    }
+  }
 
-      <div class="input-group">
-        <label for="referral">Referral Code (optional)</label>
-        <input type="text" id="referral" placeholder="Enter referral code" />
-      </div>
+  function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    document.cookie = cname + "=" + encodeURIComponent(cvalue) + ";expires=" + d.toUTCString() + ";path=/";
+  }
 
-      <button type="submit" class="btn-primary">Register</button>
+  function getCookie(cname) {
+    const name = cname + "=";
+    const ca = document.cookie.split(';');
+    for(let c of ca) {
+      while (c.charAt(0) === ' ') c = c.substring(1);
+      if (c.indexOf(name) === 0) return decodeURIComponent(c.substring(name.length));
+    }
+    return "";
+  }
+</script>
 
-      <div class="links">
-        Already have an account? <a href="login.html">Login</a>
-      </div>
-    </form>
-  </div>
-
-  <script>
-    document.getElementById("registerForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const username = document.getElementById("username").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const referral = document.getElementById("referral").value.trim();
-
-      if (!username || !email || !phone || !password) {
-        alert("Please fill in all required fields.");
-        return;
-      }
-
-      // Get existing users or initialize
-      const users = JSON.parse(localStorage.getItem("registered_users")) || [];
-
-      // Check for duplicate
-      const userExists = users.find(u => u.username === username || u.email === email);
-      if (userExists) {
-        alert("Username or email already exists. Please try another.");
-        return;
-      }
-
-      // Save new user
-      const newUser = { username, email, phone, password, referral };
-      users.push(newUser);
-      localStorage.setItem("registered_users", JSON.stringify(users));
-      localStorage.setItem("current_user", JSON.stringify(newUser)); // Auto-login (optional)
-
-      alert("Registration successful!");
-      window.location.href = "dashboard.html"; // redirect to dashboard
-    });
-  </script>
 </body>
 </html>
