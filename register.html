@@ -120,25 +120,37 @@
 
   function registerUser(event) {
     event.preventDefault();
-    const username = document.getElementById("username").value;
-    const email = document.getElementById("email").value;
-    const phone = document.getElementById("phone").value;
-    const password = document.getElementById("password").value;
 
-    if (username && email && phone && password) {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("username", username);
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const remember = document.getElementById("remember").checked;
 
-      if (document.getElementById("remember").checked) {
-        setCookie("hustle_user", username, 30);
-        setCookie("hustle_email", email, 30);
-        setCookie("hustle_phone", phone, 30);
-      }
-
-      window.location.href = "dashboard.html";
-    } else {
-      alert("Please fill in all fields.");
+    if (!(username && email && phone && password)) {
+      return alert("Please fill in all fields.");
     }
+
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    // Prevent duplicate username
+    if (users.some(user => user.username === username)) {
+      return alert("Username already exists. Try a different one.");
+    }
+
+    const userData = { username, email, phone, password };
+    users.push(userData);
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("currentUser", JSON.stringify(userData));
+    localStorage.setItem("isLoggedIn", "true");
+
+    if (remember) {
+      setCookie("hustle_user", username, 30);
+      setCookie("hustle_email", email, 30);
+      setCookie("hustle_phone", phone, 30);
+    }
+
+    window.location.href = "dashboard.html";
   }
 
   function setCookie(cname, cvalue, exdays) {
@@ -159,4 +171,4 @@
 </script>
 
 </body>
-  </html>
+</html>
