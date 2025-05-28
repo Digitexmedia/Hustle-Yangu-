@@ -126,17 +126,29 @@
         return;
       }
 
-      // Deduct
-      setWalletBalance(balance - amount);
+      // Deduct from wallet
+      const newBalance = balance - amount;
+      setWalletBalance(newBalance);
       displayBalance();
+
+      // Save transaction history
+      const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+      transactions.push({
+        type: "Withdraw",
+        amount: amount,
+        date: new Date().toISOString(),
+        phone: phone
+      });
+      localStorage.setItem("transactions", JSON.stringify(transactions));
 
       messageEl.innerHTML = `<div class="success">KES ${amount.toFixed(2)} sent to ${phone}! 🎉 Please wait for confirmation message</div>`;
 
-      // Clear fields
+      // Clear inputs
       document.getElementById('withdrawAmount').value = '';
       document.getElementById('phone').value = '';
     }
 
+    // Show balance on page load
     displayBalance();
   </script>
 
