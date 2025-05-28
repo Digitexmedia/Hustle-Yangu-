@@ -28,18 +28,18 @@
 <body>
 
   <h2>Logging Out...</h2>
-  <p>Thank you for using Hustle Yangu. Redirecting to register page shortly.</p>
+  <p>Thank you for using Hustle Yangu. Redirecting to login page shortly.</p>
 
   <script>
     // Clear all localStorage data
     localStorage.clear();
 
-    // Clear the auth_user cookie
+    // Clear the authentication cookie
     document.cookie = "auth_user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-    // Redirect to register.html after 2.5 seconds
+    // Redirect to login after 2-3 seconds
     setTimeout(() => {
-      window.location.href = "register.html";
+      window.location.href = "login.html";
     }, 2500);
   </script>
 
