@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile - Hustle Yangu</title>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #22d3ee;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .card {
+      background-color: #1e293b;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    label {
+      display: block;
+      color: #fbbf24;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: none;
+      background-color: #334155;
+      color: white;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background-color: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #16a34a;
+    }
+
+    .section-title {
+      margin-top: 30px;
+      color: #f97316;
+      text-align: center;
+    }
+
+    .success, .error {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .success {
+      color: #10b981;
+    }
+
+    .error {
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>User Profile</h2>
+
+  <div class="card">
+    <!-- Editable Info -->
+    <label for="username">Username:</label>
+    <input type="text" id="username" placeholder="Enter your name">
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="Enter your email">
+
+    <label for="phone">Phone Number:</label>
+    <input type="text" id="phone" placeholder="07XXXXXXXX">
+
+    <button onclick="updateProfile()">Update Profile</button>
+    <div id="profileMsg" class="success"></div>
+
+    <!-- Password Reset -->
+    <h3 class="section-title">Reset Password</h3>
+    <input type="password" id="newPassword" placeholder="Enter new password">
+    <button onclick="resetPassword()">Update Password</button>
+    <div id="passMsg" class="success"></div>
+  </div>
+
+  <script>
+    // Load saved data
+    window.onload = () => {
+      document.getElementById("username").value = localStorage.getItem("username") || "";
+      document.getElementById("email").value = localStorage.getItem("email") || "";
+      document.getElementById("phone").value = localStorage.getItem("phone") || "";
+    };
+
+    function updateProfile() {
+      const name = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const msg = document.getElementById("profileMsg");
+
+      if (!name || !email || !phone.match(/^07\d{8}$/)) {
+        msg.innerText = "Please enter valid details.";
+        msg.className = "error";
+        return;
+      }
+
+      localStorage.setItem("username", name);
+      localStorage.setItem("email", email);
+      localStorage.setItem("phone", phone);
+      msg.innerText = "Profile updated successfully!";
+      msg.className = "success";
+    }
+
+    function resetPassword() {
+      const newPassword = document.getElementById("newPassword").value;
+      const msg = document.getElementById("passMsg");
+
+      if (newPassword.length < 4) {
+        msg.innerText = "Password too short!";
+        msg.className = "error";
+        return;
+      }
+
+      localStorage.setItem("password", newPassword);
+      msg.innerText = "Password updated successfully!";
+      msg.className = "success";
+      document.getElementById("newPassword").value = "";
+    }
+  </script>
+
+</body>
+</html>
