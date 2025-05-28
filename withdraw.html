@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Withdraw - Hustle Yangu</title>
+  <style>
+    body {
+      background-color: #0f172a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #f97316;
+    }
+
+    .card {
+      background-color: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    .card label {
+      display: block;
+      margin-top: 15px;
+      color: #fbbf24;
+    }
+
+    .card input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: none;
+      background-color: #334155;
+      color: white;
+    }
+
+    .btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #dc2626;
+    }
+
+    .balance {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+      color: #22d3ee;
+    }
+
+    .success {
+      color: #10b981;
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .error {
+      color: #f87171;
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Withdraw Funds</h2>
+
+<div class="balance" id="walletBalance">Wallet: KES 0.00</div>
+
+<div class="card">
+  <label for="withdrawAmount">Enter Amount (KES):</label>
+  <input type="number" id="withdrawAmount" placeholder="e.g. 500">
+
+  <label for="phone">Phone Number (Safaricom):</label>
+  <input type="text" id="phone" placeholder="e.g. 07XXXXXXXX">
+
+  <button class="btn" onclick="makeWithdrawal()">Withdraw Now</button>
+
+  <div id="message"></div>
+</div>
+
+<script>
+  function getWalletBalance() {
+    return parseFloat(localStorage.getItem('wallet') || '0');
+  }
+
+  function setWalletBalance(amount) {
+    localStorage.setItem('wallet', amount.toFixed(2));
+  }
+
+  function displayBalance() {
+    const balance = getWalletBalance();
+    document.getElementById('walletBalance').innerText = `Wallet: KES ${balance.toFixed(2)}`;
+  }
+
+  function makeWithdrawal() {
+    const amount = parseFloat(document.getElementById('withdrawAmount').value);
+    const phone = document.getElementById('phone').value.trim();
+    const messageEl = document.getElementById('message');
+    messageEl.innerText = '';
+
+    if (isNaN(amount) || amount <= 0 || !phone.match(/^07\d{8}$/)) {
+      messageEl.innerHTML = `<div class="error">Enter a valid amount and Safaricom phone number.</div>`;
+      return;
+    }
+
+    let balance = getWalletBalance();
+
+    if (amount > balance) {
+      messageEl.innerHTML = `<div class="error">Insufficient wallet balance!</div>`;
+      return;
+    }
+
+    const status = Math.random() < 0.8 ? "Pending" : "Failed"; // 80% chance of going pending
+
+    if (status === "Pending") {
+      setWalletBalance(balance - amount);
+      displayBalance();
+      messageEl.innerHTML = `<div class="success">KES ${amount.toFixed(2)} sent to ${phone}! 🎉 Status: Pending</div>`;
+    } else {
+      messageEl.innerHTML = `<div class="error">Transaction failed. Please try again.</div>`;
+    }
+
+    const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+    transactions.push({
+      type: "Withdraw",
+      amount,
+      phone,
+      date: new Date().toISOString(),
+      status
+    });
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+
+    document.getElementById('withdrawAmount').value = '';
+    document.getElementById('phone').value = '';
+  }
+
+  displayBalance();
+</script>
+
+</body>
+  </html>
