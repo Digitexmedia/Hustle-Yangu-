@@ -140,13 +140,18 @@
     const overlay = document.getElementById('overlay');
     const usernameDisplay = document.getElementById('usernameDisplay');
 
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    if (!user) {
-      window.location.href = "index.html";
-    } else {
-      usernameDisplay.textContent = `Hi, ${user.username}`;
+    // Check login
+    let user;
+    try {
+      user = JSON.parse(localStorage.getItem("currentUser"));
+      if (!user || !user.username) throw new Error("Invalid user");
+    } catch (e) {
+      window.location.href = "login.html";
     }
 
+    usernameDisplay.textContent = `Hi, ${user.username}`;
+
+    // Toggle sidebar
     hamburger.addEventListener('click', () => {
       sidebar.classList.toggle('show');
       overlay.classList.toggle('show');
@@ -157,7 +162,7 @@
       overlay.classList.remove('show');
     });
 
-    // Optional: Close sidebar on menu click (mobile)
+    // Auto-close sidebar on link click (mobile)
     document.querySelectorAll("#sidebar a").forEach(link => {
       link.addEventListener('click', () => {
         if (window.innerWidth < 768) {
