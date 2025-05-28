@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deposit - Hustle Yangu</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transactions - Hustle Yangu</title>
   <style>
     body {
       background-color: #0f172a;
@@ -13,146 +13,154 @@
     }
 
     h2 {
-      color: #10b981;
+      color: #facc15;
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    .card {
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 8px 12px;
       background-color: #1e293b;
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 500px;
-      margin: auto;
+      border: none;
+      border-radius: 8px;
+      color: white;
     }
 
-    .card label {
-      display: block;
-      margin-top: 15px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+
+    th {
+      background-color: #334155;
       color: #fbbf24;
     }
 
-    .card input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: none;
-      background-color: #334155;
-      color: white;
+    tr:hover {
+      background-color: #273549;
     }
 
-    .btn {
-      margin-top: 20px;
-      width: 100%;
-      padding: 12px;
-      background-color: #10b981;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
+    .status {
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
     }
 
-    .btn:hover {
-      background-color: #059669;
-    }
-
-    .balance {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 18px;
-      color: #22d3ee;
-    }
-
-    .message {
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .success {
+    .Completed {
       color: #10b981;
     }
 
-    .error {
-      color: #f87171;
+    .Pending {
+      color: #fbbf24;
+    }
+
+    .Failed {
+      color: #ef4444;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 20px;
+      color: #94a3b8;
     }
   </style>
 </head>
 <body>
 
-<h2>Deposit Funds</h2>
+<h2>All Transactions</h2>
 
-<div class="balance" id="walletBalance">Wallet: KES 0.00</div>
+<div class="filters">
+  <select id="typeFilter" onchange="filterTransactions()">
+    <option value="All">All Types</option>
+    <option value="Deposit">Deposit</option>
+    <option value="Withdraw">Withdraw</option>
+  </select>
 
-<div class="card">
-  <label for="amount">Enter Amount (KES):</label>
-  <input type="number" id="amount" placeholder="e.g. 500">
-
-  <label for="reference">Transaction Reference Code:</label>
-  <input type="text" id="reference" placeholder="e.g. TES9HFZKWP">
-
-  <button class="btn" onclick="makeDeposit()">Deposit Now</button>
-
-  <div class="message" id="successMsg"></div>
+  <select id="statusFilter" onchange="filterTransactions()">
+    <option value="All">All Status</option>
+    <option value="Completed">Completed</option>
+    <option value="Pending">Pending</option>
+    <option value="Failed">Failed</option>
+  </select>
 </div>
 
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Amount (KES)</th>
+      <th>Reference / Phone</th>
+      <th>Status</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody id="transactionTable">
+    <!-- Rows will be populated here -->
+  </tbody>
+</table>
+
+<div class="no-data" id="noData" style="display: none;">No transactions found.</div>
+
 <script>
-  function getWalletBalance() {
-    return parseFloat(localStorage.getItem('wallet') || '0');
+  function loadTransactions() {
+    return JSON.parse(localStorage.getItem("transactions") || "[]");
   }
 
-  function setWalletBalance(amount) {
-    localStorage.setItem('wallet', amount.toFixed(2));
-  }
+  function filterTransactions() {
+    const typeFilter = document.getElementById("typeFilter").value;
+    const statusFilter = document.getElementById("statusFilter").value;
+    const transactions = loadTransactions();
 
-  function displayBalance() {
-    document.getElementById('walletBalance').innerText = `Wallet: KES ${getWalletBalance().toFixed(2)}`;
-  }
-
-  function makeDeposit() {
-    const amount = parseFloat(document.getElementById('amount').value);
-    const reference = document.getElementById('reference').value.trim();
-    const msg = document.getElementById('successMsg');
-    msg.innerText = '';
-
-    if (isNaN(amount) || amount <= 0 || !reference) {
-      msg.innerHTML = `<div class="error">Enter a valid amount and reference.</div>`;
-      return;
-    }
-
-    const status = Math.random() < 0.9 ? "Completed" : "Failed"; // 90% success rate
-
-    if (status === "Completed") {
-      setWalletBalance(getWalletBalance() + amount);
-      displayBalance();
-      msg.innerHTML = `<div class="success">KES ${amount.toFixed(2)} deposited successfully! 🎉</div>`;
-    } else {
-      msg.innerHTML = `<div class="error">Deposit failed! Please try again later.</div>`;
-    }
-
-    // Save transaction
-    const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-    transactions.push({
-      type: "Deposit",
-      amount,
-      reference,
-      date: new Date().toISOString(),
-      status
+    const filtered = transactions.filter(tx => {
+      const matchType = typeFilter === "All" || tx.type === typeFilter;
+      const matchStatus = statusFilter === "All" || tx.status === statusFilter;
+      return matchType && matchStatus;
     });
-    localStorage.setItem("transactions", JSON.stringify(transactions));
 
-    document.getElementById('amount').value = '';
-    document.getElementById('reference').value = '';
+    const tbody = document.getElementById("transactionTable");
+    tbody.innerHTML = "";
+
+    if (filtered.length === 0) {
+      document.getElementById("noData").style.display = "block";
+      return;
+    } else {
+      document.getElementById("noData").style.display = "none";
+    }
+
+    filtered.forEach(tx => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${tx.type}</td>
+        <td>KES ${tx.amount.toFixed(2)}</td>
+        <td>${tx.reference || tx.phone || '-'}</td>
+        <td><span class="status ${tx.status}">${tx.status}</span></td>
+        <td>${new Date(tx.date).toLocaleString()}</td>
+      `;
+
+      tbody.appendChild(tr);
+    });
   }
 
-  displayBalance();
+  // Load on page
+  filterTransactions();
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
