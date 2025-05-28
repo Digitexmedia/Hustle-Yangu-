@@ -73,6 +73,11 @@
     .links a:hover {
       color: #ff8c00;
     }
+    .error {
+      color: #ff4d4f;
+      margin-top: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -93,6 +98,7 @@
       <label for="remember">Remember me</label>
     </div>
     <button type="submit" class="btn-primary">Login</button>
+    <div class="error" id="errorMsg"></div>
     <div class="links">
       <a href="register.html">Don't have an account? Register</a>
     </div>
@@ -100,7 +106,7 @@
 </div>
 
 <script>
-  // Auto-fill if remembered
+  // Auto-fill username if remembered
   window.addEventListener('DOMContentLoaded', () => {
     const savedUser = getCookie('hustle_user');
     if (savedUser) {
@@ -110,34 +116,39 @@
 
   function loginUser(e) {
     e.preventDefault();
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const remember = document.getElementById("remember").checked;
 
-    // Fake login logic
-    if (username && password) {
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const match = users.find(user => user.username === username && user.password === password);
+
+    if (match) {
+      // Set session and cookie
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("username", username);
 
-      if (document.getElementById("remember").checked) {
+      if (remember) {
         setCookie("hustle_user", username, 30);
       }
 
       window.location.href = "dashboard.html";
     } else {
-      alert("Invalid credentials.");
+      document.getElementById("errorMsg").innerText = "Invalid username or password.";
     }
   }
 
   function setCookie(cname, cvalue, exdays) {
     const d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    document.cookie = cname + "=" + encodeURIComponent(cvalue) + ";expires=" + d.toUTCString() + ";path=/";
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + encodeURIComponent(cvalue) + ";" + expires + ";path=/";
   }
 
   function getCookie(cname) {
     const name = cname + "=";
     const ca = document.cookie.split(';');
-    for(let c of ca) {
+    for (let c of ca) {
       while (c.charAt(0) === ' ') c = c.substring(1);
       if (c.indexOf(name) === 0) return decodeURIComponent(c.substring(name.length));
     }
