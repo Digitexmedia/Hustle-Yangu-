@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -37,7 +38,7 @@
     .plan p {
       margin: 5px 0;
     }
-    .join-btn {
+    .join-btn, .withdraw-btn {
       margin-top: 10px;
       padding: 10px 20px;
       background-color: #10b981;
@@ -46,7 +47,7 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .join-btn:hover {
+    .join-btn:hover, .withdraw-btn:hover {
       background-color: #059669;
     }
     .notification {
@@ -55,15 +56,24 @@
       color: #facc15;
     }
     #investmentChart {
-      max-width: 600px;
+      max-width: 700px;
       margin: 30px auto;
     }
   </style>
 </head>
-<body><h2>Choose Your VIP Plan</h2>
+<body>
+
+<h2>Choose Your VIP Plan</h2>
 <div class="plans" id="plansContainer"></div>
 <div class="notification" id="notification"></div>
-<canvas id="investmentChart"></canvas><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script>
+<canvas id="investmentChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  if (!localStorage.getItem("username")) {
+    window.location.href = "login.html";
+  }
+
   const plans = [
     { name: "Basic", capital: 600 },
     { name: "Bronze", capital: 1200 },
@@ -80,11 +90,27 @@
   let wallet = parseFloat(localStorage.getItem('walletBalance') || '0');
   let activeInvestments = JSON.parse(localStorage.getItem('investments') || '[]');
 
+  function syncWallet() {
+    // Replace this with actual fetch() to sync with server.
+    console.log("Syncing wallet to server: KES " + wallet.toFixed(2));
+  }
+
   function updateUI() {
     const container = document.getElementById("plansContainer");
     container.innerHTML = "";
+    document.getElementById("notification").innerText = "";
+
+    // Decrement investment days
+    activeInvestments.forEach(inv => {
+      if (inv.days > 0) inv.days--;
+    });
+
+    localStorage.setItem('investments', JSON.stringify(activeInvestments));
+
+    // Display all plans
     plans.forEach((plan, index) => {
-      const dailyIncome = plan.capital * 0.2;
+      const dailyIncome = plan.capital * 0.13;
+      const existing = activeInvestments.find(inv => inv.name === plan.name && inv.days > 0);
       const div = document.createElement("div");
       div.className = "plan";
       div.innerHTML = `
@@ -92,68 +118,123 @@
         <p>Capital: KES ${plan.capital.toLocaleString()}</p>
         <p>Daily Income: KES ${dailyIncome.toLocaleString()}</p>
         <p>Duration: 10 Days</p>
-        <button class="join-btn" onclick="joinPlan(${index})">Join</button>
+        ${existing 
+          ? `<p style='color:#22d3ee;'>Active: ${existing.days} day(s) left</p>` 
+          : `<button class="join-btn" onclick="joinPlan(${index})">Join</button>`}
       `;
       container.appendChild(div);
     });
+
+    // Completed Investments (ready for withdrawal)
+    activeInvestments.forEach((inv, i) => {
+      if (inv.days === 0 && !inv.withdrawn) {
+        const div = document.createElement("div");
+        div.className = "plan";
+        div.innerHTML = `
+          <h3>${inv.name} - Completed</h3>
+          <p>Capital: KES ${inv.capital.toLocaleString()}</p>
+          <p>Total Profit: KES ${(inv.income * 10).toLocaleString()}</p>
+          <button class="withdraw-btn" onclick="withdrawProfit(${i})">Withdraw Profits</button>
+        `;
+        container.appendChild(div);
+      }
+    });
+
     drawChart();
+    syncWallet();
   }
 
   function joinPlan(index) {
     const plan = plans[index];
-    const dailyIncome = plan.capital * 0.2;
+    const dailyIncome = plan.capital * 0.13;
+
     if (wallet < plan.capital) {
-      document.getElementById("notification").innerText = "! Insufficient account balance, please top up!";
+      document.getElementById("notification").innerText = "❌ Insufficient funds! Please deposit.";
       return;
     }
+
+    const alreadyJoined = activeInvestments.some(inv => inv.name === plan.name && inv.days > 0);
+    if (alreadyJoined) {
+      document.getElementById("notification").innerText = "❌ Already invested in this VIP plan.";
+      return;
+    }
+
     wallet -= plan.capital;
+    activeInvestments.push({
+      name: plan.name,
+      capital: plan.capital,
+      income: dailyIncome,
+      days: 10,
+      withdrawn: false
+    });
+
     localStorage.setItem("walletBalance", wallet);
-    activeInvestments.push({ name: plan.name, capital: plan.capital, income: dailyIncome, days: 10 });
     localStorage.setItem("investments", JSON.stringify(activeInvestments));
-    document.getElementById("notification").innerText = "Congratulations 👏 You have joined " + plan.name + "!";
+
+    document.getElementById("notification").innerText = `🎉 Success! You joined ${plan.name}.`;
     updateUI();
   }
 
+  function withdrawProfit(index) {
+    const investment = activeInvestments[index];
+    if (investment.withdrawn) return;
+
+    const totalProfit = investment.income * 10;
+    wallet += totalProfit;
+    investment.withdrawn = true;
+
+    localStorage.setItem("walletBalance", wallet);
+    localStorage.setItem("investments", JSON.stringify(activeInvestments));
+
+    document.getElementById("notification").innerText = `✅ KES ${totalProfit.toLocaleString()} has been added to your wallet.`;
+    updateUI();
+  }
+
+  let chartInstance = null;
   function drawChart() {
     const ctx = document.getElementById("investmentChart").getContext("2d");
-    const labels = activeInvestments.map((inv, i) => inv.name + " (#" + (i + 1) + ")");
+    const labels = activeInvestments.map((inv, i) => `${inv.name} (#${i + 1})`);
     const data = activeInvestments.map(inv => inv.capital);
-    new Chart(ctx, {
+
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
       type: "bar",
       data: {
         labels,
         datasets: [{
-          label: "Capital Invested",
+          label: "Capital Invested (KES)",
           data,
-          backgroundColor: "#38bdf8",
+          backgroundColor: "#38bdf8"
         }]
       },
       options: {
         responsive: true,
+        animation: {
+          duration: 1000,
+          easing: 'easeOutBounce'
+        },
         scales: {
           y: {
             beginAtZero: true,
-            ticks: {
-              color: '#fff'
-            }
+            ticks: { color: '#fff' }
           },
           x: {
-            ticks: {
-              color: '#fff'
-            }
+            ticks: { color: '#fff' }
           }
         },
         plugins: {
           legend: {
-            labels: {
-              color: '#fff'
-            }
+            labels: { color: '#fff' }
           }
         }
       }
     });
   }
 
+  // Initialize
   updateUI();
-</script></body>
+</script>
+
+</body>
 </html>
