@@ -2,134 +2,138 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Transactions - Hustle Yangu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transaction History - Hustle Yangu</title>
   <style>
     body {
       background-color: #0f172a;
       color: white;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
+      max-width: 800px;
+      margin: auto;
     }
-
     h2 {
       color: #f97316;
       text-align: center;
+      margin-bottom: 20px;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      background-color: #1e293b;
+      border-radius: 10px;
+      overflow: hidden;
     }
-
     th, td {
-      padding: 12px;
+      padding: 12px 15px;
       text-align: left;
-      border-bottom: 1px solid #334155;
     }
-
     th {
-      background-color: #1e293b;
+      background-color: #334155;
       color: #fbbf24;
+      font-weight: 600;
     }
-
     tr:nth-child(even) {
-      background-color: #1e293b;
+      background-color: #283048;
     }
-
-    .no-data {
+    tr:hover {
+      background-color: #475569;
+    }
+    .type-deposit {
+      color: #22c55e; /* green */
+      font-weight: bold;
+    }
+    .type-withdraw {
+      color: #ef4444; /* red */
+      font-weight: bold;
+    }
+    .no-transactions {
       text-align: center;
-      margin-top: 30px;
-      color: #f87171;
-    }
-
-    @media screen and (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-
-      tr {
-        margin-bottom: 15px;
-      }
-
-      td {
-        padding-left: 50%;
-        position: relative;
-      }
-
-      td::before {
-        position: absolute;
-        top: 12px;
-        left: 15px;
-        width: 45%;
-        white-space: nowrap;
-        font-weight: bold;
-        color: #94a3b8;
-      }
-
-      td:nth-of-type(1)::before { content: "Type"; }
-      td:nth-of-type(2)::before { content: "Amount"; }
-      td:nth-of-type(3)::before { content: "Date"; }
-
-      thead {
-        display: none;
-      }
+      margin-top: 40px;
+      font-size: 18px;
+      color: #94a3b8;
     }
   </style>
 </head>
 <body>
 
-  <h2>🧾 Wallet Transactions</h2>
+  <h2>Transaction History</h2>
 
   <table id="transactionsTable">
     <thead>
       <tr>
+        <th>Date & Time</th>
         <th>Type</th>
         <th>Amount (KES)</th>
-        <th>Date</th>
+        <th>Details</th>
       </tr>
     </thead>
-    <tbody id="transactionsBody">
+    <tbody>
+      <!-- Transactions will be inserted here -->
     </tbody>
   </table>
 
-  <div class="no-data" id="noData">No transactions found.</div>
+  <div id="noTransactionsMsg" class="no-transactions" style="display:none;">
+    No transactions found.
+  </div>
 
   <script>
-    function formatDate(date) {
-      return new Date(date).toLocaleString("en-KE", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      return d.toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
       });
     }
 
     function loadTransactions() {
-      const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-      const tbody = document.getElementById("transactionsBody");
-      const noData = document.getElementById("noData");
+      const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+      const tbody = document.querySelector('#transactionsTable tbody');
+      const noTransMsg = document.getElementById('noTransactionsMsg');
 
       if (transactions.length === 0) {
-        noData.style.display = "block";
+        document.getElementById('transactionsTable').style.display = 'none';
+        noTransMsg.style.display = 'block';
         return;
       }
 
-      noData.style.display = "none";
-      tbody.innerHTML = "";
+      noTransMsg.style.display = 'none';
+      document.getElementById('transactionsTable').style.display = 'table';
 
-      transactions.reverse().forEach(tx => {
-        const row = document.createElement("tr");
+      // Sort transactions newest first
+      transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-        row.innerHTML = `
-          <td style="color: ${tx.type === 'Deposit' ? '#10b981' : '#ef4444'};"><strong>${tx.type}</strong></td>
-          <td>KES ${parseFloat(tx.amount).toFixed(2)}</td>
-          <td>${formatDate(tx.date)}</td>
-        `;
+      tbody.innerHTML = ''; // Clear
 
-        tbody.appendChild(row);
+      transactions.forEach(tx => {
+        const tr = document.createElement('tr');
+
+        const dateTd = document.createElement('td');
+        dateTd.textContent = formatDate(tx.date);
+
+        const typeTd = document.createElement('td');
+        typeTd.textContent = tx.type;
+        typeTd.className = tx.type.toLowerCase() === 'deposit' ? 'type-deposit' : 'type-withdraw';
+
+        const amountTd = document.createElement('td');
+        amountTd.textContent = tx.amount.toFixed(2);
+
+        const detailsTd = document.createElement('td');
+        if (tx.type.toLowerCase() === 'withdraw' && tx.phone) {
+          detailsTd.textContent = `Sent to: ${tx.phone}`;
+        } else if (tx.type.toLowerCase() === 'deposit' && tx.reference) {
+          detailsTd.textContent = `Ref: ${tx.reference}`;
+        } else {
+          detailsTd.textContent = '-';
+        }
+
+        tr.appendChild(dateTd);
+        tr.appendChild(typeTd);
+        tr.appendChild(amountTd);
+        tr.appendChild(detailsTd);
+
+        tbody.appendChild(tr);
       });
     }
 
