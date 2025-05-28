@@ -1,11 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hustle Yangu Dashboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,131 +17,397 @@
       color: white;
     }
 
-    .sidebar {
-      height: 100%;
+    /* Sidebar */
+    #sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
       width: 250px;
+      height: 100vh;
+      background-color: #1e293b;
+      padding-top: 60px;
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    #sidebar.hidden {
+      transform: translateX(-260px);
+    }
+    #sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #sidebar ul li {
+      margin: 0;
+    }
+    #sidebar ul li a {
+      display: block;
+      padding: 15px 25px;
+      color: #fbbf24;
+      text-decoration: none;
+      border-left: 4px solid transparent;
+      transition: background-color 0.2s, border-color 0.2s;
+      font-weight: 600;
+    }
+    #sidebar ul li a:hover,
+    #sidebar ul li a.active {
+      background-color: #334155;
+      border-left-color: #f97316;
+      color: white;
+    }
+
+    /* Header with hamburger */
+    #header {
       position: fixed;
       top: 0;
       left: 0;
+      height: 60px;
+      width: 100%;
       background-color: #1e293b;
-      overflow-x: hidden;
-      padding-top: 20px;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      z-index: 2000;
-    }
-
-    .sidebar.show {
-      transform: translateX(0);
-    }
-
-    .sidebar a {
-      padding: 12px 20px;
-      text-decoration: none;
-      font-size: 16px;
-      color: white;
       display: flex;
       align-items: center;
-      gap: 12px;
-      transition: background-color 0.3s;
+      padding: 0 20px;
+      z-index: 1100;
+      color: #fbbf24;
+    }
+    #hamburger {
+      font-size: 24px;
+      cursor: pointer;
+      user-select: none;
+      display: none;
+      margin-right: 15px;
+    }
+    #header h1 {
+      margin: 0;
+      font-size: 20px;
     }
 
-    .sidebar a:hover {
+    /* Main content */
+    #main {
+      margin-left: 250px;
+      padding: 80px 30px 30px;
+      transition: margin-left 0.3s ease;
+      min-height: 100vh;
+      background-color: #0f172a;
+    }
+    #main.full {
+      margin-left: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #sidebar {
+        transform: translateX(-260px);
+      }
+      #sidebar.show {
+        transform: translateX(0);
+      }
+      #hamburger {
+        display: block;
+      }
+      #main {
+        margin-left: 0;
+        padding: 80px 20px 20px;
+      }
+      #overlay {
+        display: none;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 100vw;
+        height: calc(100vh - 60px);
+        background-color: rgba(0,0,0,0.5);
+        z-index: 900;
+      }
+      #overlay.show {
+        display: block;
+      }
+    }
+
+    /* Tabs for Login/Register */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 25px;
+      gap: 20px;
+    }
+    .tab {
+      padding: 10px 30px;
       background-color: #334155;
-    }
-
-    .closebtn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 28px;
+      color: #fbbf24;
+      font-weight: 700;
       cursor: pointer;
+      border-radius: 10px 10px 0 0;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    .tab.active {
+      background-color: #f97316;
       color: white;
     }
 
-    .hamburger {
-      font-size: 26px;
-      cursor: pointer;
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      color: white;
-      z-index: 2100;
+    /* Form container */
+    .form-container {
+      max-width: 450px;
+      background-color: #1e293b;
+      padding: 30px;
+      border-radius: 12px;
+      margin: 0 auto;
+      box-shadow: 0 0 10px #f97316aa;
     }
 
-    .backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
+    /* Form styling */
+    form label {
+      display: block;
+      margin-bottom: 6px;
+      color: #fbbf24;
+      font-weight: 600;
+    }
+    form input {
       width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.4);
-      z-index: 1500;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: none;
+      background-color: #334155;
+      color: white;
+      font-size: 16px;
+    }
+    form button {
+      width: 100%;
+      padding: 12px;
+      background-color: #f97316;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    form button:hover {
+      background-color: #ea580c;
+    }
+
+    /* Success and error messages */
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 600;
       display: none;
     }
-
-    .backdrop.show {
-      display: block;
+    .message.success {
+      color: #10b981;
     }
-
-    .main-content {
-      margin-left: 0;
-      padding: 20px;
-    }
-
-    @media (min-width: 768px) {
-      .main-content {
-        margin-left: 250px;
-      }
+    .message.error {
+      color: #ef4444;
     }
   </style>
 </head>
+<body>
 
-<body onload="loadSection('home')">
+  <!-- Header with hamburger -->
+  <header id="header">
+    <div id="hamburger">&#9776;</div>
+    <h1>Hustle Yangu Dashboard</h1>
+  </header>
 
-<div class="hamburger" onclick="openSidebar()"><i class="fas fa-bars"></i></div>
-<div class="backdrop" id="backdrop" onclick="closeSidebar()"></div>
+  <!-- Sidebar menu -->
+  <nav id="sidebar">
+    <ul>
+      <li><a href="dashboard.html" class="active">Home</a></li>
+      <li><a href="vip.html">VIP</a></li>
+      <li><a href="invites.html">Invites</a></li>
+      <li><a href="deposit.html">Deposit</a></li>
+      <li><a href="withdraw.html">Withdraw</a></li>
+      <li><a href="transactions.html">Transactions</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="app.html">App</a></li>
+      <li><a href="logout.html">Logout</a></li>
+    </ul>
+  </nav>
 
-<div id="sidebar" class="sidebar">
-  <div class="closebtn" onclick="closeSidebar()">&times;</div>
-  <a href="javascript:void(0);" onclick="loadSection('home')"><i class="fas fa-home"></i> Home</a>
-  <a href="javascript:void(0);" onclick="loadSection('vip')"><i class="fas fa-gem"></i> VIP</a>
-  <a href="javascript:void(0);" onclick="loadSection('invites')"><i class="fas fa-qrcode"></i> Invites</a>
-  <a href="javascript:void(0);" onclick="loadSection('deposit')"><i class="fas fa-coins"></i> Deposit</a>
-  <a href="javascript:void(0);" onclick="loadSection('withdraw')"><i class="fas fa-money-bill-wave"></i> Withdraw</a>
-  <a href="javascript:void(0);" onclick="loadSection('transactions')"><i class="fas fa-file-invoice-dollar"></i> Transactions</a>
-  <a href="javascript:void(0);" onclick="loadSection('profile')"><i class="fas fa-user-cog"></i> Profile</a>
-  <a href="javascript:void(0);" onclick="loadSection('app')"><i class="fas fa-mobile-alt"></i> App</a>
-  <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
-</div>
+  <!-- Overlay for mobile sidebar -->
+  <div id="overlay"></div>
 
-<div class="main-content" id="main-content">
-  <!-- Content from individual pages will load here -->
-</div>
+  <!-- Main content -->
+  <main id="main">
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="login">Login</div>
+      <div class="tab" data-tab="register">Register</div>
+    </div>
 
-<script>
-  function openSidebar() {
-    document.getElementById("sidebar").classList.add("show");
-    document.getElementById("backdrop").classList.add("show");
-  }
+    <!-- Login form -->
+    <section class="form-container" id="login-form">
+      <form>
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="email" placeholder="Enter email" required />
 
-  function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("show");
-    document.getElementById("backdrop").classList.remove("show");
-  }
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" placeholder="Enter password" required />
 
-  function loadSection(section) {
-    fetch(`dashboard/${section}.html`)
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById("main-content").innerHTML = html;
+        <button type="submit">Login</button>
+      </form>
+      <div class="message success" id="loginSuccess">Login successful! Redirecting...</div>
+      <div class="message error" id="loginError">Invalid email or password.</div>
+    </section>
+
+    <!-- Register form -->
+    <section class="form-container" id="register-form" style="display:none;">
+      <form>
+        <label for="regUsername">Username</label>
+        <input id="regUsername" type="text" placeholder="Enter username" required />
+
+        <label for="regEmail">Email</label>
+        <input id="regEmail" type="email" placeholder="Enter email" required />
+
+        <label for="regPhone">Phone Number</label>
+        <input id="regPhone" type="tel" placeholder="07XXXXXXXX" pattern="07\d{8}" required />
+
+        <label for="regPassword">Password</label>
+        <input id="regPassword" type="password" placeholder="Enter password" minlength="6" required />
+
+        <button type="submit">Register</button>
+      </form>
+      <div class="message success" id="registerSuccess">Registration successful! You can now login.</div>
+      <div class="message error" id="registerError">Email already registered.</div>
+    </section>
+  </main>
+
+  <script>
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburger');
+    const overlay = document.getElementById('overlay');
+
+    function closeSidebar() {
+      sidebar.classList.remove('show');
+      overlay.classList.remove('show');
+    }
+
+    function openSidebar() {
+      sidebar.classList.add('show');
+      overlay.classList.add('show');
+    }
+
+    hamburger.addEventListener('click', () => {
+      if (sidebar.classList.contains('show')) {
         closeSidebar();
-      })
-      .catch(err => {
-        document.getElementById("main-content").innerHTML = "<p>Failed to load section.</p>";
-      });
-  }
-</script>
+      } else {
+        openSidebar();
+      }
+    });
 
+    overlay.addEventListener('click', closeSidebar);
+
+    // Close sidebar when menu link clicked on mobile
+    sidebar.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) closeSidebar();
+      });
+    });
+
+    // Tabs toggle
+    const tabs = document.querySelectorAll('.tab');
+    const loginFormSection = document.getElementById('login-form');
+    const registerFormSection = document.getElementById('register-form');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        if (tab.dataset.tab === 'login') {
+          loginFormSection.style.display = 'block';
+          registerFormSection.style.display = 'none';
+        } else {
+          loginFormSection.style.display = 'none';
+          registerFormSection.style.display = 'block';
+        }
+      });
+    });
+
+    // REGISTER form logic
+    const regForm = registerFormSection.querySelector('form');
+    const registerSuccess = document.getElementById('registerSuccess');
+    const registerError = document.getElementById('registerError');
+
+    regForm.addEventListener('submit', e => {
+      e.preventDefault();
+      registerSuccess.style.display = 'none';
+      registerError.style.display = 'none';
+
+      const username = regForm.regUsername.value.trim();
+      const email = regForm.regEmail.value.trim().toLowerCase();
+      const phone = regForm.regPhone.value.trim();
+      const password = regForm.regPassword.value;
+
+      if (!username || !email || !phone.match(/^07\d{8}$/) || password.length < 6) {
+        alert('Please fill all fields correctly. Phone must start with 07 and be 10 digits. Password at least 6 chars.');
+        return;
+      }
+
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      if (users.find(u => u.email === email)) {
+        registerError.style.display = 'block';
+        return;
+      }
+
+      users.push({ username, email, phone, password });
+      localStorage.setItem('users', JSON.stringify(users));
+
+      registerSuccess.style.display = 'block';
+      regForm.reset();
+
+      // Switch to login tab after registration
+      tabs.forEach(t => t.classList.remove('active'));
+      tabs[0].classList.add('active');
+      loginFormSection.style.display = 'block';
+      registerFormSection.style.display = 'none';
+    });
+
+    // LOGIN form logic
+    const loginForm = loginFormSection.querySelector('form');
+    const loginSuccess = document.getElementById('loginSuccess');
+    const loginError = document.getElementById('loginError');
+
+    loginForm.addEventListener('submit', e => {
+      e.preventDefault();
+      loginSuccess.style.display = 'none';
+      loginError.style.display = 'none';
+
+      const email = loginForm.loginEmail.value.trim().toLowerCase();
+      const password = loginForm.loginPassword.value;
+
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (user) {
+        loginSuccess.style.display = 'block';
+        loginError.style.display = 'none';
+
+        // Save current user in localStorage (for session simulation)
+        localStorage.setItem('currentUser', JSON.stringify(user));
+
+        // Redirect to profile or dashboard after 1.5 sec
+        setTimeout(() => {
+          window.location.href = 'profile.html'; // or 'dashboard.html' depending on flow
+        }, 1500);
+      } else {
+        loginError.style.display = 'block';
+      }
+    });
+  </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
