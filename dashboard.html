@@ -1,177 +1,217 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard | Hustle Yangu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Hustle Yangu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #0f172a;
       color: white;
     }
-    #header {
-      height: 60px;
-      background: #1e293b;
+    .container {
+      display: flex;
+    }
+    .sidebar {
+      width: 220px;
+      background-color: #1e293b;
+      height: 100vh;
+      padding: 20px 10px;
+      position: fixed;
+    }
+    .sidebar h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
       color: #facc15;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      justify-content: space-between;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
+      text-align: center;
     }
-    #hamburger {
-      font-size: 28px;
-      cursor: pointer;
-      display: none;
-    }
-    #sidebar {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      width: 240px;
-      height: 100%;
-      background: #1e293b;
-      overflow-y: auto;
-      transform: translateX(0);
-      transition: transform 0.3s ease;
-      z-index: 999;
-    }
-    #sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-    #sidebar ul li a {
-      display: flex;
-      align-items: center;
-      padding: 15px 20px;
-      color: #fbbf24;
-      text-decoration: none;
-      border-left: 4px solid transparent;
-      transition: 0.2s;
-      font-weight: 600;
-    }
-    #sidebar ul li a:hover,
-    #sidebar ul li a.active {
-      background: #334155;
-      border-left-color: #f97316;
+    .sidebar a {
+      display: block;
+      padding: 10px;
+      margin: 5px 0;
       color: white;
+      text-decoration: none;
+      border-radius: 5px;
     }
-    #sidebar svg {
-      width: 20px;
-      height: 20px;
-      margin-right: 10px;
-      fill: currentColor;
+    .sidebar a:hover {
+      background-color: #334155;
     }
-    #main {
+    .main-content {
       margin-left: 240px;
-      padding: 80px 20px 20px;
-      min-height: 100vh;
-    }
-    #overlay {
-      display: none;
-      position: fixed;
-      top: 60px;
-      left: 0;
-      width: 100%;
-      height: calc(100% - 60px);
-      background: rgba(0,0,0,0.5);
-      z-index: 998;
-    }
-    @media (max-width: 768px) {
-      #hamburger {
-        display: block;
-      }
-      #sidebar {
-        transform: translateX(-260px);
-        position: fixed;
-      }
-      #sidebar.show {
-        transform: translateX(0);
-      }
-      #main {
-        margin-left: 0;
-        padding-top: 80px;
-      }
-      #overlay.show {
-        display: block;
-      }
-    }
+      padding: 20px;
+      width: calc(100% - 240px);
+    }.welcome {
+  font-size: 20px;
+  margin-bottom: 20px;
+  background: #1e40af;
+  padding: 15px;
+  border-radius: 10px;
+  color: #fbbf24;
+}
+
+.balance-cards, .extras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.card {
+  flex: 1;
+  min-width: 180px;
+  background-color: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  color: white;
+}
+
+.card h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.card h3 {
+  font-size: 18px;
+  color: #22d3ee;
+}
+
+.promo-banner {
+  background-color: #38bdf8;
+  padding: 12px;
+  border-radius: 10px;
+  color: black;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.transactions {
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.transactions table {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+}
+
+.transactions th, .transactions td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #334155;
+}
+
+.referral {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #1e40af;
+  border-radius: 10px;
+  color: #22d3ee;
+}
+
+.slider {
+  margin: 20px 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.slide {
+  background-color: #1e3a8a;
+  padding: 15px;
+  animation: slide 10s infinite;
+  color: #facc15;
+  font-weight: bold;
+  border-radius: 10px;
+}
+
+@keyframes slide {
+  0%, 49% {
+    transform: translateX(0);
+  }
+  50%, 100% {
+    transform: translateX(-100%);
+  }
+}
+
+.footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+@media (max-width: 600px) {
+  .balance-cards, .extras {
+    flex-direction: column;
+  }
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
   </style>
 </head>
-<body>
-
-  <div id="header">
-    <div id="hamburger">&#9776;</div>
-    <h1>Hustle Yangu</h1>
-    <div id="usernameDisplay"></div>
+<body onload="checkAuth()">
+  <div class="container">
+    <div class="sidebar">
+      <h2>Hustle Yangu</h2>
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="vip.html"><i class="fas fa-crown"></i> VIP</a>
+      <a href="invites.html"><i class="fas fa-users"></i> Invites</a>
+      <a href="deposit.html"><i class="fas fa-wallet"></i> Deposit</a>
+      <a href="withdraw.html"><i class="fas fa-hand-holding-usd"></i> Withdraw</a>
+      <a href="transactions.html"><i class="fas fa-exchange-alt"></i> Transactions</a>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="app.html"><i class="fas fa-mobile-alt"></i> App</a>
+      <a href="login.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    <div class="main-content">
+      <div class="welcome">Welcome, <span id="usernameDisplay"></span> to Hustle Yangu</div>
+      <div class="slider">
+        <div class="slide">💰 Invite friends & earn KES 100 per referral!</div>
+        <div class="slide">📈 Start investing from KES 600 and earn 13% daily for 10 days!</div>
+      </div>
+      <div class="balance-cards">
+        <div class="card"><h4>Account Balance</h4><h3>KES 0.00</h3></div>
+        <div class="card"><h4>Total Investment</h4><h3>KES 0.00</h3></div>
+        <div class="card"><h4>Daily Income</h4><h3>KES 0.00</h3></div>
+      </div>
+      <div class="promo-banner">Investment Plan: Start from KES 600 and earn daily profits!</div>
+      <div class="extras">
+        <div class="card"><h4>Deposits</h4><h3>KES 0.00</h3></div>
+        <div class="card"><h4>Cashouts</h4><h3>KES 0.00</h3></div>
+        <div class="card"><h4>Support</h4><h3>WhatsApp</h3></div>
+      </div>
+      <div class="transactions">
+        <h4>Transaction History</h4>
+        <table>
+          <tr><th>Type</th><th>Amount</th><th>Date</th></tr>
+          <tr><td>Deposit</td><td>KES 0.00</td><td>--</td></tr>
+        </table>
+      </div>
+      <div class="referral">
+        Share to earn more: <br>
+        <strong>https://hustleyangu.site/register?ref=6723</strong>
+      </div>
+      <div class="footer">&copy; 2025 Hustle Yangu. All rights reserved.</div>
+    </div>
   </div>
-
-  <div id="sidebar">
-    <ul>
-      <li><a href="dashboard.html" class="active"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg> Home</a></li>
-      <li><a href="vip.html"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zM4 20v-1a7 7 0 0114 0v1H4z"/></svg> VIP</a></li>
-      <li><a href="invites.html"><svg viewBox="0 0 24 24"><path d="M21 12l-9-9-9 9h6v9h6v-9z"/></svg> Invites</a></li>
-      <li><a href="deposit.html"><svg viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg> Deposit</a></li>
-      <li><a href="withdraw.html"><svg viewBox="0 0 24 24"><path d="M16 12l-4-4-4 4m8 0l-4 4-4-4"/></svg> Withdraw</a></li>
-      <li><a href="transactions.html"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg> Transactions</a></li>
-      <li><a href="profile.html"><svg viewBox="0 0 24 24"><path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zM12 2a4 4 0 100 8 4 4 0 000-8z"/></svg> Profile</a></li>
-      <li><a href="app.html"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3z"/></svg> App</a></li>
-      <li><a href="logout.html"><svg viewBox="0 0 24 24"><path d="M16 13v-2H7v-3l-5 4 5 4v-3h9z"/></svg> Logout</a></li>
-    </ul>
-  </div>
-
-  <div id="overlay"></div>
-
-  <div id="main">
-    <h2>Welcome to Your Hustle Yangu Dashboard!</h2>
-    <p>Use the left menu to explore VIP plans, deposits, earnings, and more.</p>
-    <!-- Add dashboard widgets/stats here -->
-  </div>
-
   <script>
-    const sidebar = document.getElementById('sidebar');
-    const hamburger = document.getElementById('hamburger');
-    const overlay = document.getElementById('overlay');
-    const usernameDisplay = document.getElementById('usernameDisplay');
-
-    // Check login
-    let user;
-    try {
-      user = JSON.parse(localStorage.getItem("currentUser"));
-      if (!user || !user.username) throw new Error("Invalid user");
-    } catch (e) {
-      window.location.href = "login.html";
+    function checkAuth() {
+      const user = localStorage.getItem("username");
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        document.getElementById("usernameDisplay").textContent = user;
+      }
     }
-
-    usernameDisplay.textContent = `Hi, ${user.username}`;
-
-    // Toggle sidebar
-    hamburger.addEventListener('click', () => {
-      sidebar.classList.toggle('show');
-      overlay.classList.toggle('show');
-    });
-
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('show');
-      overlay.classList.remove('show');
-    });
-
-    // Auto-close sidebar on link click (mobile)
-    document.querySelectorAll("#sidebar a").forEach(link => {
-      link.addEventListener('click', () => {
-        if (window.innerWidth < 768) {
-          sidebar.classList.remove('show');
-          overlay.classList.remove('show');
-        }
-      });
-    });
   </script>
-
 </body>
 </html>
