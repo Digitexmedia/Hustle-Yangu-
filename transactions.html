@@ -3,237 +3,168 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VIP Plans - Hustle Yangu</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <title>Transactions - Hustle Yangu</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #0f172a;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #facc15;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 8px 12px;
+      background-color: #1e293b;
+      border: none;
+      border-radius: 8px;
       color: white;
     }
-    h2 {
-      text-align: center;
-      padding: 20px;
-      color: #facc15;
-    }
-    .plans {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-    .plan {
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
       background-color: #1e293b;
       border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      border: 2px solid #f97316;
+      overflow: hidden;
     }
-    .plan h3 {
-      margin: 10px 0;
-      color: #38bdf8;
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
     }
-    .plan p {
-      margin: 5px 0;
+
+    th {
+      background-color: #334155;
+      color: #fbbf24;
     }
-    .join-btn, .withdraw-btn {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #10b981;
-      color: white;
-      border: none;
+
+    tr:hover {
+      background-color: #273549;
+    }
+
+    .status {
+      font-weight: bold;
+      padding: 4px 8px;
       border-radius: 6px;
-      cursor: pointer;
     }
-    .join-btn:hover, .withdraw-btn:hover {
-      background-color: #059669;
+
+    .Completed {
+      color: #10b981;
     }
-    .notification {
+
+    .Pending {
+      color: #fbbf24;
+    }
+
+    .Failed {
+      color: #ef4444;
+    }
+
+    .no-data {
       text-align: center;
-      margin-top: 20px;
-      color: #facc15;
-    }
-    #investmentChart {
-      max-width: 700px;
-      margin: 30px auto;
+      padding: 20px;
+      color: #94a3b8;
     }
   </style>
 </head>
 <body>
 
-<h2>Choose Your VIP Plan</h2>
-<div class="plans" id="plansContainer"></div>
-<div class="notification" id="notification"></div>
-<canvas id="investmentChart"></canvas>
+<h2>All Transactions</h2>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="filters">
+  <select id="typeFilter" onchange="filterTransactions()">
+    <option value="All">All Types</option>
+    <option value="Deposit">Deposit</option>
+    <option value="Withdraw">Withdraw</option>
+  </select>
+
+  <select id="statusFilter" onchange="filterTransactions()">
+    <option value="All">All Status</option>
+    <option value="Completed">Completed</option>
+    <option value="Pending">Pending</option>
+    <option value="Failed">Failed</option>
+  </select>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Amount (KES)</th>
+      <th>Reference / Phone</th>
+      <th>Status</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody id="transactionTable">
+    <!-- Rows will be populated here -->
+  </tbody>
+</table>
+
+<div class="no-data" id="noData" style="display: none;">No transactions found.</div>
+
 <script>
+  // Redirect to login if not authenticated
   if (!localStorage.getItem("username")) {
     window.location.href = "login.html";
   }
 
-  const plans = [
-    { name: "Basic", capital: 600 },
-    { name: "Bronze", capital: 1200 },
-    { name: "Silver", capital: 2400 },
-    { name: "Gold", capital: 4800 },
-    { name: "Platinum", capital: 12000 },
-    { name: "Diamond", capital: 17000 },
-    { name: "Executive", capital: 22000 },
-    { name: "Elite", capital: 28000 },
-    { name: "Supreme", capital: 35000 },
-    { name: "Royal", capital: 50000 },
-  ];
-
-  let wallet = parseFloat(localStorage.getItem('walletBalance') || '0');
-  let activeInvestments = JSON.parse(localStorage.getItem('investments') || '[]');
-
-  function syncWallet() {
-    // Replace this with actual fetch() to sync with server.
-    console.log("Syncing wallet to server: KES " + wallet.toFixed(2));
+  function loadTransactions() {
+    return JSON.parse(localStorage.getItem("transactions") || "[]");
   }
 
-  function updateUI() {
-    const container = document.getElementById("plansContainer");
-    container.innerHTML = "";
-    document.getElementById("notification").innerText = "";
+  function filterTransactions() {
+    const typeFilter = document.getElementById("typeFilter").value;
+    const statusFilter = document.getElementById("statusFilter").value;
+    const transactions = loadTransactions();
 
-    // Decrement investment days
-    activeInvestments.forEach(inv => {
-      if (inv.days > 0) inv.days--;
+    const filtered = transactions.filter(tx => {
+      const matchType = typeFilter === "All" || tx.type === typeFilter;
+      const matchStatus = statusFilter === "All" || tx.status === statusFilter;
+      return matchType && matchStatus;
     });
 
-    localStorage.setItem('investments', JSON.stringify(activeInvestments));
+    const tbody = document.getElementById("transactionTable");
+    tbody.innerHTML = "";
 
-    // Display all plans
-    plans.forEach((plan, index) => {
-      const dailyIncome = plan.capital * 0.13;
-      const existing = activeInvestments.find(inv => inv.name === plan.name && inv.days > 0);
-      const div = document.createElement("div");
-      div.className = "plan";
-      div.innerHTML = `
-        <h3>VIP-${index + 1} (${plan.name})</h3>
-        <p>Capital: KES ${plan.capital.toLocaleString()}</p>
-        <p>Daily Income: KES ${dailyIncome.toLocaleString()}</p>
-        <p>Duration: 10 Days</p>
-        ${existing 
-          ? `<p style='color:#22d3ee;'>Active: ${existing.days} day(s) left</p>` 
-          : `<button class="join-btn" onclick="joinPlan(${index})">Join</button>`}
+    if (filtered.length === 0) {
+      document.getElementById("noData").style.display = "block";
+      return;
+    } else {
+      document.getElementById("noData").style.display = "none";
+    }
+
+    filtered.forEach(tx => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${tx.type}</td>
+        <td>KES ${Number(tx.amount).toFixed(2)}</td>
+        <td>${tx.reference || tx.phone || '-'}</td>
+        <td><span class="status ${tx.status}">${tx.status}</span></td>
+        <td>${new Date(tx.date).toLocaleString()}</td>
       `;
-      container.appendChild(div);
-    });
 
-    // Completed Investments (ready for withdrawal)
-    activeInvestments.forEach((inv, i) => {
-      if (inv.days === 0 && !inv.withdrawn) {
-        const div = document.createElement("div");
-        div.className = "plan";
-        div.innerHTML = `
-          <h3>${inv.name} - Completed</h3>
-          <p>Capital: KES ${inv.capital.toLocaleString()}</p>
-          <p>Total Profit: KES ${(inv.income * 10).toLocaleString()}</p>
-          <button class="withdraw-btn" onclick="withdrawProfit(${i})">Withdraw Profits</button>
-        `;
-        container.appendChild(div);
-      }
-    });
-
-    drawChart();
-    syncWallet();
-  }
-
-  function joinPlan(index) {
-    const plan = plans[index];
-    const dailyIncome = plan.capital * 0.13;
-
-    if (wallet < plan.capital) {
-      document.getElementById("notification").innerText = "❌ Insufficient funds! Please deposit.";
-      return;
-    }
-
-    const alreadyJoined = activeInvestments.some(inv => inv.name === plan.name && inv.days > 0);
-    if (alreadyJoined) {
-      document.getElementById("notification").innerText = "❌ Already invested in this VIP plan.";
-      return;
-    }
-
-    wallet -= plan.capital;
-    activeInvestments.push({
-      name: plan.name,
-      capital: plan.capital,
-      income: dailyIncome,
-      days: 10,
-      withdrawn: false
-    });
-
-    localStorage.setItem("walletBalance", wallet);
-    localStorage.setItem("investments", JSON.stringify(activeInvestments));
-
-    document.getElementById("notification").innerText = `🎉 Success! You joined ${plan.name}.`;
-    updateUI();
-  }
-
-  function withdrawProfit(index) {
-    const investment = activeInvestments[index];
-    if (investment.withdrawn) return;
-
-    const totalProfit = investment.income * 10;
-    wallet += totalProfit;
-    investment.withdrawn = true;
-
-    localStorage.setItem("walletBalance", wallet);
-    localStorage.setItem("investments", JSON.stringify(activeInvestments));
-
-    document.getElementById("notification").innerText = `✅ KES ${totalProfit.toLocaleString()} has been added to your wallet.`;
-    updateUI();
-  }
-
-  let chartInstance = null;
-  function drawChart() {
-    const ctx = document.getElementById("investmentChart").getContext("2d");
-    const labels = activeInvestments.map((inv, i) => `${inv.name} (#${i + 1})`);
-    const data = activeInvestments.map(inv => inv.capital);
-
-    if (chartInstance) chartInstance.destroy();
-
-    chartInstance = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [{
-          label: "Capital Invested (KES)",
-          data,
-          backgroundColor: "#38bdf8"
-        }]
-      },
-      options: {
-        responsive: true,
-        animation: {
-          duration: 1000,
-          easing: 'easeOutBounce'
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { color: '#fff' }
-          },
-          x: {
-            ticks: { color: '#fff' }
-          }
-        },
-        plugins: {
-          legend: {
-            labels: { color: '#fff' }
-          }
-        }
-      }
+      tbody.appendChild(tr);
     });
   }
 
-  // Initialize
-  updateUI();
+  // Load on page
+  filterTransactions();
 </script>
 
 </body>
