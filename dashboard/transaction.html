@@ -3,142 +3,190 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Transaction History - Hustle Yangu</title>
+  <title>Transactions - Hustle Yangu</title>
   <style>
     body {
       background-color: #0f172a;
       color: white;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
-      max-width: 800px;
-      margin: auto;
     }
     h2 {
       color: #f97316;
-      text-align: center;
       margin-bottom: 20px;
+      text-align: center;
+    }
+    .filter-container {
+      max-width: 600px;
+      margin: 0 auto 20px auto;
+      text-align: center;
+    }
+    select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background-color: #1e293b;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      min-width: 160px;
     }
     table {
-      width: 100%;
       border-collapse: collapse;
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
       background-color: #1e293b;
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
     }
     th, td {
       padding: 12px 15px;
-      text-align: left;
+      text-align: center;
     }
     th {
-      background-color: #334155;
-      color: #fbbf24;
+      background-color: #f97316;
+      color: white;
       font-weight: 600;
     }
     tr:nth-child(even) {
-      background-color: #283048;
+      background-color: #334155;
     }
     tr:hover {
-      background-color: #475569;
+      background-color: #2563eb;
+      cursor: pointer;
+    }
+    .status-pending {
+      color: #facc15; /* amber */
+      font-weight: 600;
+    }
+    .status-completed {
+      color: #22c55e; /* green */
+      font-weight: 600;
     }
     .type-deposit {
-      color: #22c55e; /* green */
-      font-weight: bold;
+      color: #22d3ee; /* teal */
+      font-weight: 600;
     }
     .type-withdraw {
       color: #ef4444; /* red */
-      font-weight: bold;
+      font-weight: 600;
     }
     .no-transactions {
       text-align: center;
       margin-top: 40px;
-      font-size: 18px;
       color: #94a3b8;
+      font-style: italic;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
 
-  <h2>Transaction History</h2>
+  <h2>Your Transactions</h2>
+
+  <div class="filter-container">
+    <label for="filterType" style="margin-right: 10px; font-weight: 600;">Filter:</label>
+    <select id="filterType">
+      <option value="all">All</option>
+      <option value="Deposit">Deposit</option>
+      <option value="Withdraw">Withdraw</option>
+      <option value="Pending">Pending</option>
+      <option value="Completed">Completed</option>
+    </select>
+  </div>
 
   <table id="transactionsTable">
     <thead>
       <tr>
-        <th>Date & Time</th>
         <th>Type</th>
         <th>Amount (KES)</th>
-        <th>Details</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Phone (if withdraw)</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Transactions will be inserted here -->
+      <!-- Transactions will be inserted here dynamically -->
     </tbody>
   </table>
 
-  <div id="noTransactionsMsg" class="no-transactions" style="display:none;">
+  <div id="noTxMsg" class="no-transactions" style="display:none;">
     No transactions found.
   </div>
 
-  <script>
-    function formatDate(dateStr) {
-      const d = new Date(dateStr);
-      return d.toLocaleString(undefined, {
-        year: 'numeric', month: 'short', day: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: '2-digit'
-      });
+<script>
+  const filterSelect = document.getElementById('filterType');
+  const transactionsTableBody = document.querySelector('#transactionsTable tbody');
+  const noTxMsg = document.getElementById('noTxMsg');
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleString();
+  }
+
+  function renderTransactions(filter = 'all') {
+    let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+
+    if (filter === 'Deposit' || filter === 'Withdraw') {
+      transactions = transactions.filter(tx => tx.type === filter);
+    } else if (filter === 'Pending' || filter === 'Completed') {
+      transactions = transactions.filter(tx => tx.status === filter);
     }
 
-    function loadTransactions() {
-      const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-      const tbody = document.querySelector('#transactionsTable tbody');
-      const noTransMsg = document.getElementById('noTransactionsMsg');
+    transactionsTableBody.innerHTML = '';
 
-      if (transactions.length === 0) {
-        document.getElementById('transactionsTable').style.display = 'none';
-        noTransMsg.style.display = 'block';
-        return;
-      }
-
-      noTransMsg.style.display = 'none';
+    if (transactions.length === 0) {
+      noTxMsg.style.display = 'block';
+      document.getElementById('transactionsTable').style.display = 'none';
+      return;
+    } else {
+      noTxMsg.style.display = 'none';
       document.getElementById('transactionsTable').style.display = 'table';
-
-      // Sort transactions newest first
-      transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-      tbody.innerHTML = ''; // Clear
-
-      transactions.forEach(tx => {
-        const tr = document.createElement('tr');
-
-        const dateTd = document.createElement('td');
-        dateTd.textContent = formatDate(tx.date);
-
-        const typeTd = document.createElement('td');
-        typeTd.textContent = tx.type;
-        typeTd.className = tx.type.toLowerCase() === 'deposit' ? 'type-deposit' : 'type-withdraw';
-
-        const amountTd = document.createElement('td');
-        amountTd.textContent = tx.amount.toFixed(2);
-
-        const detailsTd = document.createElement('td');
-        if (tx.type.toLowerCase() === 'withdraw' && tx.phone) {
-          detailsTd.textContent = `Sent to: ${tx.phone}`;
-        } else if (tx.type.toLowerCase() === 'deposit' && tx.reference) {
-          detailsTd.textContent = `Ref: ${tx.reference}`;
-        } else {
-          detailsTd.textContent = '-';
-        }
-
-        tr.appendChild(dateTd);
-        tr.appendChild(typeTd);
-        tr.appendChild(amountTd);
-        tr.appendChild(detailsTd);
-
-        tbody.appendChild(tr);
-      });
     }
 
-    loadTransactions();
-  </script>
+    transactions.forEach(tx => {
+      const tr = document.createElement('tr');
+
+      // Type with color
+      const typeTd = document.createElement('td');
+      typeTd.textContent = tx.type;
+      typeTd.className = tx.type === 'Deposit' ? 'type-deposit' : 'type-withdraw';
+      tr.appendChild(typeTd);
+
+      // Amount
+      const amountTd = document.createElement('td');
+      amountTd.textContent = tx.amount.toFixed(2);
+      tr.appendChild(amountTd);
+
+      // Status with color
+      const statusTd = document.createElement('td');
+      statusTd.textContent = tx.status;
+      statusTd.className = tx.status === 'Pending' ? 'status-pending' : 'status-completed';
+      tr.appendChild(statusTd);
+
+      // Date formatted
+      const dateTd = document.createElement('td');
+      dateTd.textContent = formatDate(tx.date);
+      tr.appendChild(dateTd);
+
+      // Phone (if withdraw)
+      const phoneTd = document.createElement('td');
+      phoneTd.textContent = tx.phone ? tx.phone : '-';
+      tr.appendChild(phoneTd);
+
+      transactionsTableBody.appendChild(tr);
+    });
+  }
+
+  filterSelect.addEventListener('change', () => {
+    renderTransactions(filterSelect.value);
+  });
+
+  // Initial render
+  renderTransactions();
+
+</script>
 
 </body>
 </html>
