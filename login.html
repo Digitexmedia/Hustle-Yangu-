@@ -4,80 +4,171 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - Hustle Yangu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     body {
-      background: #0f172a;
-      color: white;
-      font-family: sans-serif;
+      background: #0e1a2b;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
       margin: 0;
     }
+
     .login-box {
-      background: #1e293b;
-      padding: 30px;
-      border-radius: 10px;
-      width: 300px;
-      box-shadow: 0 0 10px #000;
-    }
-    input, button {
+      background: #1a2a40;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+      max-width: 400px;
+    }
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #00c6a9;
+    }
+
+    .login-box .input-group {
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+
+    .login-box .input-group i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 10px 10px 10px 35px;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
+      background: #0f1c2d;
+      color: #fff;
+      font-size: 1rem;
     }
-    input {
-      background: #334155;
-      color: white;
+
+    .login-box input:focus {
+      outline: 2px solid #00c6a9;
     }
-    button {
-      background: #f97316;
-      color: white;
+
+    .login-box label {
+      display: flex;
+      align-items: center;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #00c6a9;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      color: #000;
       cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .login-box button:hover {
+      background: #00e6c0;
+    }
+
+    .login-box .bottom-link {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .login-box .bottom-link a {
+      color: #00c6a9;
+      text-decoration: none;
+    }
+
+    .error {
+      color: #ff4d4d;
+      font-size: 0.9rem;
+      margin-bottom: 0.8rem;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-<div class="login-box">
-  <h2>Login</h2>
-  <form id="loginForm">
-    <input type="text" id="username" placeholder="Username" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <label><input type="checkbox" id="rememberMe" /> Remember Me</label>
-    <button type="submit">Login</button>
-  </form>
-</div>
+  <div class="login-box">
+    <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+    
+    <div class="error" id="error-msg">Invalid credentials. Please try again.</div>
 
-<script>
-  document.getElementById("loginForm").addEventListener("submit", function (e) {
-    e.preventDefault(); // Prevent default form submission
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <input type="text" id="username" placeholder="Username" />
+    </div>
 
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-    const rememberMe = document.getElementById("rememberMe").checked;
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="password" placeholder="Password" />
+    </div>
 
-    // Example logic (you can add better validation)
-    if (username && password) {
-      // Save to localStorage
-      localStorage.setItem("hustleUser", JSON.stringify({ username, password }));
+    <label>
+      <input type="checkbox" id="remember" /> Remember Me
+    </label>
 
-      if (rememberMe) {
-        localStorage.setItem("rememberMe", "true");
-      } else {
-        localStorage.removeItem("rememberMe");
+    <button onclick="login()">Login</button>
+
+    <div class="bottom-link">
+      Don't have an account? <a href="register.html">Register</a><br/>
+      Forgot password? <a href="reset.html">Reset</a>
+    </div>
+  </div>
+
+  <script>
+    // Load remembered credentials
+    window.onload = function() {
+      const savedUsername = localStorage.getItem("rememberedUsername");
+      const savedPassword = localStorage.getItem("rememberedPassword");
+      if (savedUsername && savedPassword) {
+        document.getElementById("username").value = savedUsername;
+        document.getElementById("password").value = savedPassword;
+        document.getElementById("remember").checked = true;
       }
+    };
 
-      // Redirect to dashboard or home
-      window.location.href = "home.html"; // Or "dashboard.html" if that's your entry page
-    } else {
-      alert("Invalid credentials");
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const remember = document.getElementById("remember").checked;
+      const errorMsg = document.getElementById("error-msg");
+
+      // Replace with your actual login logic
+      if (username === "admin" && password === "admin123") {
+        if (remember) {
+          localStorage.setItem("rememberedUsername", username);
+          localStorage.setItem("rememberedPassword", password);
+        } else {
+          localStorage.removeItem("rememberedUsername");
+          localStorage.removeItem("rememberedPassword");
+        }
+
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("currentUser", username);
+
+        // ✅ Correct landing page
+        window.location.href = "dashboard.html";
+      } else {
+        errorMsg.style.display = "block";
+      }
     }
-  });
-</script>
-
+  </script>
 </body>
 </html>
