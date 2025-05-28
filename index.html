@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hustle Yangu - Dashboard</title>
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f172a;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    /* Container for sidebar + content */
+    #container {
+      display: flex;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 250px;
+      background-color: #1e293b;
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+      transform: translateX(-260px);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .sidebar h2 {
+      color: #f97316;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      user-select: none;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex-grow: 1;
+    }
+    .sidebar ul li {
+      margin-bottom: 15px;
+    }
+    .sidebar ul li a {
+      color: #f97316;
+      text-decoration: none;
+      font-weight: 600;
+      display: block;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+      user-select: none;
+    }
+    .sidebar ul li a:hover,
+    .sidebar ul li a.active {
+      background-color: #f9731630;
+    }
+
+    /* Close (X) button inside sidebar */
+    .close-btn {
+      align-self: flex-end;
+      font-size: 24px;
+      font-weight: bold;
+      color: #f97316;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 10px;
+    }
+
+    /* Main content */
+    .main-content {
+      flex-grow: 1;
+      margin-left: 0;
+      padding: 30px;
+      background-color: #0f172a;
+      transition: margin-left 0.3s ease;
+      min-height: 100vh;
+    }
+    .main-content.shifted {
+      margin-left: 250px;
+    }
+    .main-content h1 {
+      color: #f97316;
+      margin-bottom: 20px;
+    }
+    .main-content p {
+      font-size: 1.1rem;
+      line-height: 1.5;
+      color: #e0e7ff;
+    }
+
+    /* Hamburger menu */
+    #hamburger {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 30px;
+      height: 22px;
+      cursor: pointer;
+      z-index: 1100;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      user-select: none;
+    }
+    #hamburger div {
+      height: 4px;
+      background-color: #f97316;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    /* Animate hamburger into X when open */
+    #hamburger.open div:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    #hamburger.open div:nth-child(2) {
+      opacity: 0;
+    }
+    #hamburger.open div:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* Overlay behind sidebar */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background-color: rgba(0,0,0,0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 900;
+    }
+    #overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Responsive */
+    @media (min-width: 900px) {
+      /* On large screens: sidebar always visible */
+      .sidebar {
+        position: relative;
+        transform: none !important;
+        width: 250px;
+        box-shadow: none;
+      }
+      #hamburger {
+        display: none;
+      }
+      #overlay {
+        display: none;
+      }
+      .main-content {
+        margin-left: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="container">
+    <aside class="sidebar" id="sidebar">
+      <div class="close-btn" id="closeBtn">&times;</div>
+      <h2>Hustle Yangu</h2>
+      <ul>
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="vip.html">VIP</a></li>
+        <li><a href="invites.html">Invites</a></li>
+        <li><a href="deposit.html">Deposit</a></li>
+        <li><a href="withdraw.html">Withdraw</a></li>
+        <li><a href="transactions.html">Transactions</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="app.html">App</a></li>
+        <li><a href="logout.html">Logout</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+      <h1>Welcome to Hustle Yangu Dashboard</h1>
+      <p>Manage your investments, earnings, and profile from here.</p>
+
+      <section>
+        <h2>Wallet Balance</h2>
+        <div id="walletBalance" style="font-size:1.5rem; color:#22d3ee; margin-bottom:20px;">KES 0.00</div>
+        <button id="refreshBalanceBtn" style="padding: 10px 20px; background:#f97316; border:none; border-radius:6px; cursor:pointer; color:white; font-weight:bold;">Refresh Balance</button>
+      </section>
+
+      <section style="margin-top: 40px;">
+        <h2>Quick Actions</h2>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+          <a href="deposit.html" style="background:#22c55e; padding:15px 25px; border-radius: 10px; text-decoration:none; color:#0f172a; font-weight:bold;">Make Deposit</a>
+          <a href="withdraw.html" style="background:#ef4444; padding:15px 25px; border-radius: 10px; text-decoration:none; color:#fff; font-weight:bold;">Withdraw Funds</a>
+          <a href="transactions.html" style="background:#2563eb; padding:15px 25px; border-radius: 10px; text-decoration:none; color:#fff; font-weight:bold;">View Transactions</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Hamburger menu -->
+  <div id="hamburger" aria-label="Open menu" role="button" tabindex="0">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay"></div>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburger');
+    const closeBtn = document.getElementById('closeBtn');
+    const overlay = document.getElementById('overlay');
+    const mainContent = document.getElementById('mainContent');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      hamburger.classList.add('open');
+      overlay.classList.add('show');
+      mainContent.classList.add('shifted');
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      hamburger.classList.remove('open');
+      overlay.classList.remove('show');
+      mainContent.classList.remove('shifted');
+    }
+
+    hamburger.addEventListener('click', () => {
+      if (sidebar.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+
+    closeBtn.addEventListener('click', closeSidebar);
+
+    // Close sidebar if clicking outside it
+    overlay.addEventListener('click', closeSidebar);
+
+    // Optional: close sidebar with ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+        closeSidebar();
+      }
+    });
+
+    // Wallet balance display logic
+    function getWalletBalance() {
+      return parseFloat(localStorage.getItem('wallet') || '0');
+    }
+    function displayBalance() {
+      const balance = getWalletBalance();
+      document.getElementById('walletBalance').innerText = `KES ${balance.toFixed(2)}`;
+    }
+
+    document.getElementById('refreshBalanceBtn').addEventListener('click', () => {
+      displayBalance();
+      alert('Wallet balance refreshed!');
+    });
+
+    // Initial load
+    displayBalance();
+  </script>
+
+</body>
+</html>
