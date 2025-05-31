@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Hustle Yangu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f172a;
+      color: white;
+    }
+    .container {
+      display: flex;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #1e293b;
+      height: 100vh;
+      padding: 20px 10px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+    .sidebar.hidden {
+      transform: translateX(-260px);
+    }
+    .sidebar h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #facc15;
+      text-align: center;
+    }
+    .sidebar a {
+      display: block;
+      padding: 10px;
+      margin: 5px 0;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .sidebar a:hover {
+      background-color: #334155;
+    }
+    .close-btn {
+      display: none;
+      color: #f87171;
+      font-size: 20px;
+      text-align: right;
+      cursor: pointer;
+    }
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      width: calc(100% - 250px);
+    }
+    .hamburger {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1100;
+      font-size: 24px;
+      cursor: pointer;
+      color: #fbbf24;
+    }
+    .welcome {
+      font-size: 20px;
+      margin-bottom: 20px;
+      background: #1e40af;
+      padding: 15px;
+      border-radius: 10px;
+      color: #fbbf24;
+    }
+    .balance-cards, .extras {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .card {
+      flex: 1;
+      min-width: 180px;
+      background-color: #1e293b;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      color: white;
+    }
+    .card h4 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .card h3 {
+      font-size: 18px;
+      color: #22d3ee;
+    }
+    .transactions, .referral {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+    .transactions table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .transactions th, .transactions td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+    .referral {
+      color: #22d3ee;
+    }
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .slider {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      height: 60px;
+      margin: 20px 0;
+      border-radius: 10px;
+      background: #1e3a8a;
+    }
+    .slider-track {
+      display: flex;
+      width: 200%;
+      animation: scroll 10s linear infinite;
+    }
+    .slide {
+      flex: 0 0 100%;
+      color: #facc15;
+      font-weight: bold;
+      padding: 15px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .slide img {
+      height: 30px;
+      width: auto;
+      border-radius: 5px;
+    }
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      50% { transform: translateX(-100%); }
+      100% { transform: translateX(0); }
+    }
+    @media (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+      .sidebar {
+        transform: translateX(-260px);
+      }
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      .close-btn {
+        display: block;
+      }
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body onload="authGuard()">
+
+  <div class="hamburger" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <div class="container">
+    <div class="sidebar" id="sidebar">
+      <div class="close-btn" onclick="toggleSidebar()">&times;</div>
+      <h2>Hustle Yangu</h2>
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="vip.html"><i class="fas fa-crown"></i> VIP</a>
+      <a href="invites.html"><i class="fas fa-users"></i> Invites</a>
+      <a href="deposit.html"><i class="fas fa-wallet"></i> Deposit</a>
+      <a href="withdraw.html"><i class="fas fa-hand-holding-usd"></i> Withdraw</a>
+      <a href="transactions.html"><i class="fas fa-exchange-alt"></i> Transactions</a>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="app.html"><i class="fas fa-mobile-alt"></i> App</a>
+      <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <div class="main-content">
+      <div class="welcome">Welcome, <span id="usernameDisplay"></span> to Hustle Yangu</div>
+
+      <div class="slider">
+        <div class="slider-track">
+          <div class="slide">💰 Invite friends & earn KES 100 per referral!</div>
+          <div class="slide">
+            <img src="https://files.catbox.moe/5eetk4.jpg" alt="Investment" />
+            📈 Invest KES 600+ and earn 13% daily for 10 days!
+          </div>
+        </div>
+      </div>
+
+      <div class="balance-cards">
+        <div class="card"><h4>Account Balance</h4><h3>KES 0.00</h3></div>
+        <div class="card"><h4>Total Investment</h4><h3>KES 0.00</h3></div>
+        <div class="card"><h4>Daily Income</h4><h3>KES 0.00</h3></div>
+      </div>
+
+      <div class="promo-banner card">Investment Plan: Start from KES 600 and earn daily profits!</div>
+
+      <div class="extras">
+        <div class="card"><h4>Deposits</h4><h3>KES 0.00</h3></div>
+        <div class="card"><h4>Cashouts</h4><h3>KES 0.00</h3></div>
+        <div class="card"><h4>Support</h4><h3>WhatsApp</h3></div>
+      </div>
+
+      <div class="transactions">
+        <h4>Transaction History</h4>
+        <table>
+          <tr><th>Type</th><th>Amount</th><th>Date</th></tr>
+          <tr><td>Deposit</td><td>KES 0.00</td><td>--</td></tr>
+        </table>
+      </div>
+
+      <div class="referral">
+        <h4>Your Referral Link:</h4>
+        <strong>https://hustleyangu.site/register?ref=6723</strong>
+      </div>
+
+      <div class="footer">&copy; 2025 Hustle Yangu. All rights reserved.</div>
+    </div>
+  </div>
+
+  <script>
+    function authGuard() {
+      const user = localStorage.getItem("username");
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        document.getElementById("usernameDisplay").textContent = user;
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("show");
+    }
+
+    function logoutUser() {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+
+</body>
+</html>
