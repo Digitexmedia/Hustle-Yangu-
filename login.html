@@ -121,6 +121,7 @@
     if (found) {
       localStorage.setItem("currentUser", JSON.stringify(found));
       localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("username", username); // ✅ used in dashboard
 
       if (remember) {
         setCookie("hustle_user", username, 30);
