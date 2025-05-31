@@ -133,7 +133,6 @@
 
     let users = JSON.parse(localStorage.getItem("users")) || [];
 
-    // Prevent duplicate username
     if (users.some(user => user.username === username)) {
       return alert("Username already exists. Try a different one.");
     }
@@ -143,6 +142,7 @@
     localStorage.setItem("users", JSON.stringify(users));
     localStorage.setItem("currentUser", JSON.stringify(userData));
     localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("username", username); // Optional for dashboard
 
     if (remember) {
       setCookie("hustle_user", username, 30);
