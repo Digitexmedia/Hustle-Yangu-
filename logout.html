@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Logging Out | Hustle Yangu</title>
+  <style>
+    body {
+      margin: 0;
+      background: #1a1f3d;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .logout-popup {
+      background: #262c57;
+      border: 2px solid #3a4070;
+      padding: 30px 40px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(101, 71, 255, 0.4);
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+    .logout-popup.fade-out {
+      opacity: 0;
+    }
+    h2 {
+      color: #ffc870;
+      margin-bottom: 15px;
+    }
+    p {
+      font-size: 16px;
+      color: #b5bbff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="logout-popup" id="popup">
+  <h2>Logging you out...</h2>
+  <p>We'll be back shortly 😉</p>
+</div>
+
+<script>
+  // Clear session
+  localStorage.removeItem("currentUser");
+  localStorage.removeItem("isLoggedIn");
+
+  // Add fade effect then redirect
+  setTimeout(() => {
+    document.getElementById("popup").classList.add("fade-out");
+  }, 1000);
+
+  setTimeout(() => {
+    window.location.href = "login.html";
+  }, 2000);
+</script>
+
+</body>
+</html>
